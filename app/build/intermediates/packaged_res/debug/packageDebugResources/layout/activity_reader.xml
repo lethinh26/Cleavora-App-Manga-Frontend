@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg">
+
+    <!-- Pages ViewPager (horizontal swipe) / RecyclerView (vertical scroll) -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_pages"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/bg" />
+
+    <!-- Top Bar (show/hide on tap) -->
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_md">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="back"
+            android:padding="@dimen/spacing_sm"
+            android:src="@android:drawable/ic_menu_revert" />
+
+        <TextView
+            android:id="@+id/tv_chapter_title"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_sm"
+            android:layout_weight="1"
+            android:text="Chương 1"
+            android:textColor="@color/text"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Bottom Bar (page indicator + navigation) -->
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/surface"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/spacing_md">
+
+        <ImageView
+            android:id="@+id/btn_prev_chapter"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="previous"
+            android:padding="@dimen/spacing_sm"
+            android:src="@android:drawable/ic_media_previous" />
+
+        <TextView
+            android:id="@+id/tv_page_indicator"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="1 / 20"
+            android:textColor="@color/text"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/btn_next_chapter"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="next"
+            android:padding="@dimen/spacing_sm"
+            android:src="@android:drawable/ic_media_next" />
+    </LinearLayout>
+
+</FrameLayout>

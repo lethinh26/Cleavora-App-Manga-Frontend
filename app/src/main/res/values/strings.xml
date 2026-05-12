@@ -1,0 +1,87 @@
+<resources>
+    <string name="app_name">Manga</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_genre">Thể loại</string>
+    <string name="nav_search">Tìm kiếm</string>
+    <string name="nav_library">Thư viện</string>
+    <string name="nav_profile">Hồ sơ</string>
+
+    <!-- Auth -->
+    <string name="login">Đăng nhập</string>
+    <string name="register">Đăng ký</string>
+    <string name="email">Email</string>
+    <string name="password">Mật khẩu</string>
+    <string name="confirm_password">Xác nhận mật khẩu</string>
+    <string name="display_name">Tên hiển thị</string>
+    <string name="forgot_password">Quên mật khẩu?</string>
+    <string name="no_account">Chưa có tài khoản?</string>
+    <string name="has_account">Đã có tài khoản?</string>
+
+    <!-- Profile -->
+    <string name="edit_profile">Chỉnh sửa hồ sơ</string>
+    <string name="change_password">Đổi mật khẩu</string>
+    <string name="old_password">Mật khẩu cũ</string>
+    <string name="new_password">Mật khẩu mới</string>
+    <string name="logout">Đăng xuất</string>
+    <string name="save">Lưu</string>
+    <string name="admin_panel">Quản trị</string>
+
+    <!-- Manga -->
+    <string name="manga_detail">Chi tiết truyện</string>
+    <string name="chapter_list">Danh sách chương</string>
+    <string name="start_reading">Bắt đầu đọc</string>
+    <string name="continue_reading">Tiếp tục đọc</string>
+    <string name="author">Tác giả</string>
+    <string name="artist">Họa sĩ</string>
+    <string name="status">Trạng thái</string>
+    <string name="views">Lượt xem</string>
+    <string name="likes">Yêu thích</string>
+    <string name="follows">Theo dõi</string>
+    <string name="description">Mô tả</string>
+
+    <!-- Library -->
+    <string name="tab_favorites">Yêu thích</string>
+    <string name="tab_following">Theo dõi</string>
+    <string name="tab_history">Lịch sử</string>
+    <string name="empty_list">Chưa có truyện nào</string>
+
+    <!-- Search -->
+    <string name="search_hint">Tìm kiếm truyện...</string>
+    <string name="all_genres">Tất cả</string>
+
+    <!-- Reader -->
+    <string name="chapter">Chương %1$s</string>
+    <string name="page_indicator">%1$d / %2$d</string>
+
+    <!-- Admin -->
+    <string name="admin_dashboard">Dashboard</string>
+    <string name="manage_manga">Quản lý truyện</string>
+    <string name="manage_chapter">Quản lý chương</string>
+    <string name="manage_user">Quản lý người dùng</string>
+    <string name="manage_genre">Quản lý thể loại</string>
+    <string name="add_manga">Thêm truyện</string>
+    <string name="edit_manga">Sửa truyện</string>
+    <string name="add_chapter">Thêm chương</string>
+    <string name="add_genre">Thêm thể loại</string>
+    <string name="total_manga">Tổng truyện</string>
+    <string name="total_chapter">Tổng chương</string>
+    <string name="total_user">Tổng người dùng</string>
+    <string name="delete">Xóa</string>
+    <string name="cancel">Hủy</string>
+    <string name="confirm">Xác nhận</string>
+
+    <!-- Submit Manga -->
+    <string name="submit_manga">Đăng truyện</string>
+    <string name="my_mangas">Truyện của tôi</string>
+    <string name="pending_mangas">Truyện chờ duyệt</string>
+    <string name="status_pending">Chờ duyệt</string>
+    <string name="status_approved">Đã duyệt</string>
+    <string name="status_rejected">Bị từ chối</string>
+    <string name="approve">Duyệt</string>
+    <string name="reject">Từ chối</string>
+    <string name="reject_reason">Lý do từ chối</string>
+    <string name="submitted_by">Người đăng: %1$s</string>
+    <string name="change_role">Đổi quyền</string>
+</resources>
