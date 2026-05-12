@@ -1,14 +1,14 @@
-#Sun May 10 13:54:45 ICT 2026
-base.0=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
-base.1=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
-base.2=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex
-base.3=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\12\\classes.dex
-base.4=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
-base.5=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
-base.6=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
-base.7=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
-base.8=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\7\\classes.dex
-base.9=D\:\\Mobile\\Project\\Fontend Clevora\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
+#Tue May 12 15:26:18 ICT 2026
+base.0=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
+base.1=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex
+base.2=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\10\\classes.dex
+base.3=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\12\\classes.dex
+base.4=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\14\\classes.dex
+base.5=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\1\\classes.dex
+base.6=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\2\\classes.dex
+base.7=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\3\\classes.dex
+base.8=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeProjectDexDebug\\7\\classes.dex
+base.9=D\:\\mobile_app\\cleavora-app-manga-frontend\\app\\build\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes2.dex
 path.0=classes.dex
 path.1=0/classes.dex
 path.2=10/classes.dex
