@@ -35,7 +35,6 @@ public class ApiClient {
                         if (token != null) {
                             builder.header("Authorization", "Bearer " + token);
                         }
-                        builder.header("Content-Type", "application/json");
 
                         return chain.proceed(builder.build());
                     })

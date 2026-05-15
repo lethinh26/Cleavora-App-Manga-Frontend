@@ -14,3 +14,86 @@
 .cxx
 local.properties
 .env
+TEMP.md
+
+# Built application files
+*.apk
+*.aab
+*.ap_
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java/Kotlin compiled files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+build/
+
+# Gradle files
+.gradle/
+local.properties
+
+# Android Studio files
+.idea/
+*.iml
+captures/
+.navigation/
+
+# Keystore files
+*.jks
+*.keystore
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# NDK
+.externalNativeBuild/
+.cxx/
+
+# Firebase / Google Services (nếu không muốn push)
+google-services.json
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Kotlin
+.kotlin/
+
+# Android Studio cache
+.caches/
+
+# Gradle
+.gradle/
+
+# Local config
+local.properties
+
+# Build
+/build
+/app/build
+
+# APK
+*.apk
+*.aab
+
+# Android Studio
+.idea/
+*.iml
+
+# Logs
+*.log
