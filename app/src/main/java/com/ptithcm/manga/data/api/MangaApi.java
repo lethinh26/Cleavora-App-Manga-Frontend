@@ -2,6 +2,9 @@ package com.ptithcm.manga.data.api;
 
 import com.ptithcm.manga.data.model.response.ApiResponse;
 import com.ptithcm.manga.data.model.response.FavoriteListResponse;
+import com.ptithcm.manga.data.model.response.FollowListResponse;
+import com.ptithcm.manga.data.model.response.FollowResponse;
+import com.ptithcm.manga.data.model.response.FollowStatusResponse;
 import com.ptithcm.manga.data.model.response.LikeResponse;
 import com.ptithcm.manga.data.model.response.LikeStatusResponse;
 
@@ -21,6 +24,18 @@ public interface MangaApi {
 
     @GET("v1/me/favorites")
     Call<ApiResponse<FavoriteListResponse>> getFavorites(
+            @Query("page") int page,
+            @Query("size") int size
+    );
+
+    @POST("v1/mangas/{id}/follow")
+    Call<ApiResponse<FollowResponse>> toggleFollow(@Path("id") int mangaId);
+
+    @GET("v1/mangas/{id}/follow-status")
+    Call<ApiResponse<FollowStatusResponse>> getFollowStatus(@Path("id") int mangaId);
+
+    @GET("v1/me/follows")
+    Call<ApiResponse<FollowListResponse>> getFollows(
             @Query("page") int page,
             @Query("size") int size
     );

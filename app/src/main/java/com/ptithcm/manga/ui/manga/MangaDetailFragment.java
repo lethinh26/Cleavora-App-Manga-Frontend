@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.button.MaterialButton;
 import com.ptithcm.manga.R;
 import com.ptithcm.manga.data.local.TokenManager;
+import com.ptithcm.manga.data.model.response.FollowResponse;
+import com.ptithcm.manga.data.model.response.FollowStatusResponse;
 import com.ptithcm.manga.data.model.response.LikeResponse;
 import com.ptithcm.manga.data.model.response.LikeStatusResponse;
 import com.ptithcm.manga.data.repository.MangaRepository;
@@ -23,13 +25,17 @@ public class MangaDetailFragment extends Fragment {
     private int mangaId;
 
     private MaterialButton btnLike;
+    private MaterialButton btnFollow;
     private TextView tvLikes;
+    private TextView tvFollows;
 
     private MangaRepository mangaRepository;
     private TokenManager tokenManager;
 
     private boolean isLiked = false;
+    private boolean isFollowed = false;
     private int likeCount = 0;
+    private int followCount = 0;
 
     @Nullable
     @Override
@@ -45,7 +51,9 @@ public class MangaDetailFragment extends Fragment {
         mangaId = MangaDetailFragmentArgs.fromBundle(getArguments()).getMangaId();
 
         btnLike = view.findViewById(R.id.btn_like);
+        btnFollow = view.findViewById(R.id.btn_follow);
         tvLikes = view.findViewById(R.id.tv_likes);
+        tvFollows = view.findViewById(R.id.tv_follows);
 
         mangaRepository = new MangaRepository(requireContext());
         tokenManager = TokenManager.getInstance(requireContext());
@@ -53,13 +61,19 @@ public class MangaDetailFragment extends Fragment {
         if (!tokenManager.isLoggedIn()) {
             btnLike.setEnabled(false);
             btnLike.setText("Đăng nhập để thích");
+            btnFollow.setEnabled(false);
+            btnFollow.setText("Đăng nhập để theo dõi");
             return;
         }
 
         loadLikeStatus();
+        loadFollowStatus();
 
         btnLike.setOnClickListener(v -> toggleLike());
+        btnFollow.setOnClickListener(v -> toggleFollow());
     }
+
+    // ============ LIKE ============
 
     private void loadLikeStatus() {
         mangaRepository.getLikeStatus(mangaId, new MangaRepository.MangaCallback<LikeStatusResponse>() {
@@ -71,14 +85,13 @@ public class MangaDetailFragment extends Fragment {
 
             @Override
             public void onError(String message) {
-                // Silently fail — button stays in default state
+                // silently fail
             }
         });
     }
 
     private void toggleLike() {
         btnLike.setEnabled(false);
-
         mangaRepository.toggleLike(mangaId, new MangaRepository.MangaCallback<LikeResponse>() {
             @Override
             public void onSuccess(LikeResponse data) {
@@ -104,6 +117,53 @@ public class MangaDetailFragment extends Fragment {
         } else {
             btnLike.setIconResource(android.R.drawable.btn_star_big_off);
             btnLike.setText("Yêu thích");
+        }
+    }
+
+    // ============ FOLLOW ============
+
+    private void loadFollowStatus() {
+        mangaRepository.getFollowStatus(mangaId, new MangaRepository.MangaCallback<FollowStatusResponse>() {
+            @Override
+            public void onSuccess(FollowStatusResponse data) {
+                isFollowed = data.isFollowed();
+                updateFollowButton();
+            }
+
+            @Override
+            public void onError(String message) {
+                // silently fail
+            }
+        });
+    }
+
+    private void toggleFollow() {
+        btnFollow.setEnabled(false);
+        mangaRepository.toggleFollow(mangaId, new MangaRepository.MangaCallback<FollowResponse>() {
+            @Override
+            public void onSuccess(FollowResponse data) {
+                isFollowed = data.isFollowed();
+                followCount = data.getFollowCount();
+                updateFollowButton();
+                tvFollows.setText(String.valueOf(followCount));
+                btnFollow.setEnabled(true);
+            }
+
+            @Override
+            public void onError(String message) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
+                btnFollow.setEnabled(true);
+            }
+        });
+    }
+
+    private void updateFollowButton() {
+        if (isFollowed) {
+            btnFollow.setIconResource(android.R.drawable.btn_star_big_on);
+            btnFollow.setText("Đang theo dõi");
+        } else {
+            btnFollow.setIconResource(android.R.drawable.btn_star_big_off);
+            btnFollow.setText("Theo dõi");
         }
     }
 }

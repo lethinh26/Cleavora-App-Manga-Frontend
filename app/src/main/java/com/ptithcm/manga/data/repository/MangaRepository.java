@@ -6,6 +6,9 @@ import com.ptithcm.manga.data.api.ApiClient;
 import com.ptithcm.manga.data.api.MangaApi;
 import com.ptithcm.manga.data.model.response.ApiResponse;
 import com.ptithcm.manga.data.model.response.FavoriteListResponse;
+import com.ptithcm.manga.data.model.response.FollowListResponse;
+import com.ptithcm.manga.data.model.response.FollowResponse;
+import com.ptithcm.manga.data.model.response.FollowStatusResponse;
 import com.ptithcm.manga.data.model.response.LikeResponse;
 import com.ptithcm.manga.data.model.response.LikeStatusResponse;
 
@@ -90,6 +93,75 @@ public class MangaRepository {
 
             @Override
             public void onFailure(Call<ApiResponse<FavoriteListResponse>> call, Throwable t) {
+                callback.onError("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    public void toggleFollow(int mangaId, MangaCallback<FollowResponse> callback) {
+        mangaApi.toggleFollow(mangaId).enqueue(new Callback<ApiResponse<FollowResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<FollowResponse>> call, Response<ApiResponse<FollowResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<FollowResponse> body = response.body();
+                    if (body.isSuccess()) {
+                        callback.onSuccess(body.getData());
+                    } else {
+                        callback.onError(body.getMessage());
+                    }
+                } else {
+                    callback.onError("Không thể thực hiện thao tác theo dõi");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<FollowResponse>> call, Throwable t) {
+                callback.onError("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getFollowStatus(int mangaId, MangaCallback<FollowStatusResponse> callback) {
+        mangaApi.getFollowStatus(mangaId).enqueue(new Callback<ApiResponse<FollowStatusResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<FollowStatusResponse>> call, Response<ApiResponse<FollowStatusResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<FollowStatusResponse> body = response.body();
+                    if (body.isSuccess()) {
+                        callback.onSuccess(body.getData());
+                    } else {
+                        callback.onError(body.getMessage());
+                    }
+                } else {
+                    callback.onError("Không thể kiểm tra trạng thái theo dõi");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<FollowStatusResponse>> call, Throwable t) {
+                callback.onError("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getFollows(int page, int size, MangaCallback<FollowListResponse> callback) {
+        mangaApi.getFollows(page, size).enqueue(new Callback<ApiResponse<FollowListResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<FollowListResponse>> call, Response<ApiResponse<FollowListResponse>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<FollowListResponse> body = response.body();
+                    if (body.isSuccess()) {
+                        callback.onSuccess(body.getData());
+                    } else {
+                        callback.onError(body.getMessage());
+                    }
+                } else {
+                    callback.onError("Không thể tải danh sách theo dõi");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<FollowListResponse>> call, Throwable t) {
                 callback.onError("Lỗi kết nối: " + t.getMessage());
             }
         });
