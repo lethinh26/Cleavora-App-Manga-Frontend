@@ -1,4 +1,4 @@
-package com.ptithcm.manga.ui.genre;
+package com.ptithcm.manga.adapter.manga;
 
 import android.view.LayoutInflater;
 import android.view.View;

@@ -14,7 +14,6 @@ public class ApiClient {
 
     private static final String BASE_URL = BuildConfig.BASE_URL;
     private static final int TIMEOUT = 30;
-
     private static Retrofit retrofit;
 
     public static Retrofit getInstance(android.content.Context context) {

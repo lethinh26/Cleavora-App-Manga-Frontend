@@ -5,6 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/nav_home">
 
+    <!-- Bottom Navigation Fragments -->
     <fragment
         android:id="@+id/nav_home"
         android:name="com.ptithcm.manga.ui.home.HomeFragment"
@@ -60,14 +61,14 @@
             android:id="@+id/action_profile_to_login"
             app:destination="@id/nav_login" />
         <action
-            android:id="@+id/action_profile_to_admin_dashboard"
-            app:destination="@id/nav_admin_dashboard" />
-        <action
             android:id="@+id/action_profile_to_my_mangas"
             app:destination="@id/nav_my_mangas" />
+        <action
+            android:id="@+id/action_profile_to_submit_manga"
+            app:destination="@id/nav_submit_manga" />
     </fragment>
 
-    <!-- Auth -->
+    <!-- Auth Fragments -->
     <fragment
         android:id="@+id/nav_login"
         android:name="com.ptithcm.manga.ui.auth.LoginFragment"
@@ -95,7 +96,7 @@
             app:popUpToInclusive="true" />
     </fragment>
 
-    <!-- Profile Sub -->
+    <!-- Sub Profile Fragments -->
     <fragment
         android:id="@+id/nav_edit_profile"
         android:name="com.ptithcm.manga.ui.profile.EditProfileFragment"
@@ -108,18 +109,44 @@
         android:label="@string/change_password"
         tools:layout="@layout/fragment_change_password" />
 
-    <!-- Manga -->
+    <!-- Manga Detail -->
     <fragment
         android:id="@+id/nav_manga_detail"
         android:name="com.ptithcm.manga.ui.manga.MangaDetailFragment"
         android:label="@string/manga_detail"
         tools:layout="@layout/fragment_manga_detail">
         <argument
-            android:name="mangaId"
-            app:argType="integer" />
+            android:name="mangaSlug"
+            app:argType="string" />
     </fragment>
 
-    <!-- Admin -->
+    <!-- User Content Management -->
+    <fragment
+        android:id="@+id/nav_my_mangas"
+        android:name="com.ptithcm.manga.ui.manga.MyMangasFragment"
+        android:label="@string/my_mangas"
+        tools:layout="@layout/fragment_my_mangas">
+        <action
+            android:id="@+id/action_my_mangas_to_submit"
+            app:destination="@id/nav_submit_manga" />
+        <action
+            android:id="@+id/action_my_mangas_to_manga_detail"
+            app:destination="@id/nav_manga_detail" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_submit_manga"
+        android:name="com.ptithcm.manga.ui.manga.SubmitMangaFragment"
+        android:label="@string/submit_manga"
+        tools:layout="@layout/fragment_submit_manga">
+        <action
+            android:id="@+id/action_submit_to_my_mangas"
+            app:destination="@id/nav_my_mangas"
+            app:popUpTo="@id/nav_my_mangas"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Admin Fragments -->
     <fragment
         android:id="@+id/nav_admin_dashboard"
         android:name="com.ptithcm.manga.ui.admin.AdminDashboardFragment"
@@ -181,22 +208,5 @@
         android:name="com.ptithcm.manga.ui.admin.AdminPendingFragment"
         android:label="@string/pending_mangas"
         tools:layout="@layout/fragment_admin_pending" />
-
-    <!-- User Manga Submission -->
-    <fragment
-        android:id="@+id/nav_submit_manga"
-        android:name="com.ptithcm.manga.ui.manga.SubmitMangaFragment"
-        android:label="@string/submit_manga"
-        tools:layout="@layout/fragment_submit_manga" />
-
-    <fragment
-        android:id="@+id/nav_my_mangas"
-        android:name="com.ptithcm.manga.ui.manga.MyMangasFragment"
-        android:label="@string/my_mangas"
-        tools:layout="@layout/fragment_my_mangas">
-        <action
-            android:id="@+id/action_my_mangas_to_submit"
-            app:destination="@id/nav_submit_manga" />
-    </fragment>
 
 </navigation>

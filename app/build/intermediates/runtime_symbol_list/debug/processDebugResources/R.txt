@@ -3837,14 +3837,16 @@ int id action_menu_presenter 0x7f08004b
 int id action_mode_bar 0x7f08004c
 int id action_mode_bar_stub 0x7f08004d
 int id action_mode_close_button 0x7f08004e
+int id action_my_mangas_to_manga_detail 0x7f0802a0
 int id action_my_mangas_to_submit 0x7f08004f
-int id action_profile_to_admin_dashboard 0x7f080050
 int id action_profile_to_change_password 0x7f080051
 int id action_profile_to_edit 0x7f080052
 int id action_profile_to_login 0x7f080053
 int id action_profile_to_my_mangas 0x7f080054
+int id action_profile_to_submit_manga 0x7f0802a5
 int id action_register_to_login 0x7f080055
 int id action_search_to_manga_detail 0x7f080056
+int id action_submit_to_my_mangas 0x7f0802a1
 int id action_text 0x7f080057
 int id actions 0x7f080058
 int id activity_chooser_view_content 0x7f080059
@@ -3908,6 +3910,7 @@ int id btn_prev_chapter 0x7f080092
 int id btn_register 0x7f080093
 int id btn_reject 0x7f080094
 int id btn_save 0x7f080095
+int id btn_search_submit 0x7f08029f
 int id btn_start_reading 0x7f080096
 int id btn_submit 0x7f080097
 int id btn_submit_new 0x7f080098
@@ -4242,6 +4245,7 @@ int id rv_genre_chips 0x7f0801e0
 int id rv_genres 0x7f0801e1
 int id rv_latest 0x7f0801e2
 int id rv_mangas 0x7f0801e3
+int id rv_mangas_by_genre 0x7f08029a
 int id rv_my_mangas 0x7f0801e4
 int id rv_pages 0x7f0801e5
 int id rv_pending 0x7f0801e6
@@ -4290,6 +4294,7 @@ int id snapMargins 0x7f080210
 int id south 0x7f080211
 int id spacer 0x7f080212
 int id special_effects_controller_view_tag 0x7f080213
+int id spinner_genres 0x7f080299
 int id spinner_status 0x7f080214
 int id splashscreen_icon_view 0x7f080215
 int id spline 0x7f080216
@@ -4373,6 +4378,7 @@ int id tv_chapter 0x7f080263
 int id tv_chapter_count 0x7f080264
 int id tv_chapter_number 0x7f080265
 int id tv_chapter_title 0x7f080266
+int id tv_completed_header 0x7f08029c
 int id tv_date 0x7f080267
 int id tv_description 0x7f080268
 int id tv_display_name 0x7f080269
@@ -4380,12 +4386,17 @@ int id tv_email 0x7f08026a
 int id tv_follows 0x7f08026b
 int id tv_form_title 0x7f08026c
 int id tv_genre 0x7f08026d
+int id tv_genre_name 0x7f0802a3
 int id tv_go_login 0x7f08026e
 int id tv_go_register 0x7f08026f
+int id tv_latest_header 0x7f08029d
 int id tv_likes 0x7f080270
 int id tv_name 0x7f080271
 int id tv_page_indicator 0x7f080272
+int id tv_placeholder 0x7f0802a4
+int id tv_popular_header 0x7f08029e
 int id tv_role 0x7f080273
+int id tv_selected_genre_title 0x7f08029b
 int id tv_stat_label 0x7f080274
 int id tv_stat_value 0x7f080275
 int id tv_status 0x7f080276
@@ -4582,6 +4593,7 @@ int layout ime_base_split_test_activity 0x7f0b0041
 int layout ime_secondary_split_test_activity 0x7f0b0042
 int layout item_chapter 0x7f0b0043
 int layout item_genre_chip 0x7f0b0044
+int layout item_genre_select 0x7f0b008a
 int layout item_manga_card 0x7f0b0045
 int layout item_manga_horizontal 0x7f0b0046
 int layout item_manga_pending 0x7f0b0047
