@@ -31,6 +31,7 @@ public class MangaDetailFragment extends Fragment {
 
     private String mangaSlug;
     private MangaRepository mangaRepository;
+    
 
     private ImageView ivCover, btnBack;
     private TextView tvTitle, tvAuthor, tvStatus, tvViews, tvLikes, tvFollows, tvDescription;
