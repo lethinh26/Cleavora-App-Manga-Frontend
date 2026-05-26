@@ -21,6 +21,8 @@ public class MangaResponse {
     private int likeCount;
     @SerializedName("followCount")
     private int followCount;
+    @SerializedName("followCount")
+    private int followCount;
     private List<String> genres;
 
     public int getId() { return id; }

@@ -18,7 +18,7 @@ public class LibraryPagerAdapter extends FragmentStateAdapter {
             case 0:
                 return new FavoritesTabFragment();
             case 1:
-                return new PlaceholderTabFragment("Đang theo dõi");
+                return new FollowingTabFragment();
             case 2:
                 return new PlaceholderTabFragment("Lịch sử");
             default:
