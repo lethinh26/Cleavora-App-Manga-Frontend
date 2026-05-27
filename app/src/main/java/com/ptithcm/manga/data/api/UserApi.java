@@ -1,9 +1,6 @@
 package com.ptithcm.manga.data.api;
 
-import androidx.annotation.BinderThread;
-
-import com.ptithcm.manga.data.model.request.ChangePassRequest;
-import com.ptithcm.manga.data.model.request.UpdateProfileRequest;
+import com.ptithcm.manga.data.model.request.ProfileRequest;
 import com.ptithcm.manga.data.model.response.ApiResponse;
 import com.ptithcm.manga.data.model.response.UserResponse;
 
@@ -18,8 +15,5 @@ public interface UserApi {
     Call<ApiResponse<UserResponse>> getProfile();
 
     @PUT("v1/me/profile")
-    Call<ApiResponse<UserResponse>> updateProfile(@Body UpdateProfileRequest request);
-
-    @PUT("v1/me/password")
-    Call<ApiResponse<Void>> changePassword(@Body ChangePassRequest request);
+    Call<ApiResponse<UserResponse>> updateProfile(@Body ProfileRequest request);
 }
