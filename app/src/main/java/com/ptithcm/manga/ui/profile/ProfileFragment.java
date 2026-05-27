@@ -106,7 +106,7 @@ public class ProfileFragment extends Fragment {
             if ("ADMIN".equals(role) || "SUPERADMIN".equals(role)) {
                 menuAdmin.setVisibility(View.VISIBLE);
                 menuAdmin.setOnClickListener(v ->
-                        Navigation.findNavController(v).navigate(R.id.action_profile_to_admin_dashboard));
+                        Navigation.findNavController(v).navigate(R.id.nav_admin_dashboard));
             } else {
                 menuAdmin.setVisibility(View.GONE);
             }

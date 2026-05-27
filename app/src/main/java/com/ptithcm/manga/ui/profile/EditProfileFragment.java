@@ -2,10 +2,13 @@ package com.ptithcm.manga.ui.profile;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -16,42 +19,30 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputEditText;
 import com.ptithcm.manga.R;
 import com.ptithcm.manga.data.local.TokenManager;
-import com.ptithcm.manga.data.model.request.UpdateProfileRequest;
 import com.ptithcm.manga.data.model.response.UploadResponse;
 import com.ptithcm.manga.data.model.response.UserResponse;
-import com.ptithcm.manga.data.repository.UploadRepository;
+import com.ptithcm.manga.data.repository.CloudRepository;
 import com.ptithcm.manga.data.repository.UserRepository;
-import com.ptithcm.manga.data.model.response.ApiResponse;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class EditProfileFragment extends Fragment {
-
-    private ImageView ivAvatar;
-    private TextInputEditText etDisplayName, etEmail;
-    private MaterialButton btnSave;
-    private View btnChangeAvatar;
-
+    private CloudRepository cloudRepository;
     private UserRepository userRepository;
-    private UploadRepository uploadRepository;
+
+    private EditText edtName, edtEmail;
+    private Button btnSave;
+    private CircleImageView ivAvatar;
+    private TextView btnChangeAvatar;
+    private Uri selectedImageUri;
+    private String currentAvatarUrl;
     private TokenManager tokenManager;
 
-    private String currentAvatarUrl;
-    private Uri selectedImageUri;
-
-    private final ActivityResultLauncher<String> pickImageLauncher =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -> {
-                if (uri != null) {
-                    selectedImageUri = uri;
-                    Glide.with(requireContext()).load(uri).into(ivAvatar);
-                }
-            });
 
     @Nullable
     @Override
@@ -63,135 +54,121 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        cloudRepository = new CloudRepository();
         userRepository = new UserRepository(requireContext());
-        uploadRepository = new UploadRepository(requireContext());
+        userRepository = new UserRepository(requireContext());
         tokenManager = TokenManager.getInstance(requireContext());
+        
+        findId();
 
-        ivAvatar = view.findViewById(R.id.iv_avatar);
-        etDisplayName = view.findViewById(R.id.et_display_name);
-        etEmail = view.findViewById(R.id.et_email);
-        btnSave = view.findViewById(R.id.btn_save);
-        btnChangeAvatar = view.findViewById(R.id.btn_change_avatar);
+        // mở thư viện ảnh
+        btnChangeAvatar.setOnClickListener(v -> openGallery());
+        ivAvatar.setOnClickListener(v -> openGallery());
 
-        loadCurrentProfile();
+        // click vào button để xác nhận lưu
+        btnSave.setOnClickListener(v -> handleSave(view));
 
-        btnChangeAvatar.setOnClickListener(v -> pickImageLauncher.launch("image/*"));
-        btnSave.setOnClickListener(v -> onSaveClicked());
+        if (tokenManager.isLoggedIn()) {
+            loadProfile();
+        }
     }
 
-    private void loadCurrentProfile() {
+    private void findId(){
+        edtName = getView().findViewById(R.id.et_display_name);
+        edtEmail = getView().findViewById(R.id.et_email);
+        btnSave = getView().findViewById(R.id.btn_save);
+        ivAvatar = getView().findViewById(R.id.iv_avatar);
+        btnChangeAvatar = getView().findViewById(R.id.btn_change_avatar);
+    }
+
+    private void loadProfile() {
         userRepository.getProfile(new UserRepository.UserCallback<UserResponse>() {
             @Override
             public void onSuccess(UserResponse data) {
-                if (!isAdded()) return;
+                if(!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
-                    etDisplayName.setText(data.getDisplayName());
-                    etEmail.setText(data.getEmail());
-                    currentAvatarUrl = data.getAvatarUrl();
+                    edtName.setText(data.getDisplayName());
+                    edtEmail.setText(data.getEmail());
 
-                    if (currentAvatarUrl != null && !currentAvatarUrl.isEmpty()) {
+                    if (data.getAvatarUrl() != null && !data.getAvatarUrl().isEmpty()) {
                         Glide.with(requireContext())
-                                .load(currentAvatarUrl)
+                                .load(data.getAvatarUrl())
                                 .placeholder(R.drawable.bg_placeholder_avatar)
                                 .into(ivAvatar);
                     }
                 });
+
             }
 
             @Override
             public void onError(String message) {
                 if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
-                    etDisplayName.setText(tokenManager.getDisplayName());
-                    etEmail.setText(tokenManager.getEmail());
-                    currentAvatarUrl = tokenManager.getAvatarUrl();
+                    edtName.setText(tokenManager.getDisplayName());
+                    edtEmail.setText(tokenManager.getEmail());
                 });
             }
         });
     }
 
-    private void onSaveClicked() {
-        String displayName = etDisplayName.getText() != null ? etDisplayName.getText().toString().trim() : "";
+    public void handleSave(View view){
+        String name = edtName.getText().toString().trim();
+        String email = edtEmail.getText().toString().trim();
 
-        if (displayName.isEmpty()) {
-            etDisplayName.setError("Tên hiển thị không được để trống");
+        if (name.isEmpty() || email.isEmpty()) {
+            Toast.makeText(getContext(), "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        setLoading(true);
-
         if (selectedImageUri != null) {
-            uploadAvatarThenSave(displayName);
+            cloudRepository.uploadImageToCloudinary(requireContext(), selectedImageUri, new Callback<UploadResponse>() {
+                @Override
+                public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        String newAvatarUrl = response.body().secure_url;
+                        performUpdateProfile(view, name, email, newAvatarUrl);
+                    } else {
+                        Toast.makeText(getContext(), "Tải ảnh thất bại!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<UploadResponse> call, Throwable t) {
+                    Log.e("Cloudinary", "Upload failed", t);
+                    Toast.makeText(getContext(), "Lỗi khi tải ảnh!", Toast.LENGTH_SHORT).show();
+                }
+            });
         } else {
-            saveProfile(displayName, currentAvatarUrl);
+            performUpdateProfile(view, name, email, currentAvatarUrl);
         }
     }
 
-    private void uploadAvatarThenSave(String displayName) {
-        uploadRepository.uploadImage(selectedImageUri, "avatars")
-                .enqueue(new Callback<ApiResponse<UploadResponse>>() {
-                    @Override
-                    public void onResponse(Call<ApiResponse<UploadResponse>> call,
-                                           Response<ApiResponse<UploadResponse>> response) {
-                        if (!isAdded()) return;
-                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                            String newAvatarUrl = response.body().getData().getImageUrl();
-                            saveProfile(displayName, newAvatarUrl);
-                        } else {
-                            requireActivity().runOnUiThread(() -> {
-                                setLoading(false);
-                                Toast.makeText(requireContext(), "Upload ảnh thất bại", Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ApiResponse<UploadResponse>> call, Throwable t) {
-                        if (!isAdded()) return;
-                        requireActivity().runOnUiThread(() -> {
-                            setLoading(false);
-                            Toast.makeText(requireContext(), "Lỗi kết nối khi upload ảnh", Toast.LENGTH_SHORT).show();
-                        });
-                    }
-                });
-    }
-
-    private void saveProfile(String displayName, String avatarUrl) {
-        UpdateProfileRequest request = new UpdateProfileRequest(avatarUrl, displayName);
-
-        userRepository.updateProfile(request, new UserRepository.UserCallback<UserResponse>() {
+    private void performUpdateProfile(View view, String name, String email, String avatarUrl) {
+        userRepository.updateProfile(name, email, avatarUrl, new UserRepository.UserCallback<UserResponse>() {
             @Override
             public void onSuccess(UserResponse data) {
-                if (!isAdded()) return;
-                tokenManager.saveUser(
-                        data.getId(),
-                        data.getEmail(),
-                        data.getDisplayName(),
-                        data.getRole(),
-                        data.getAvatarUrl()
-                );
-
-                requireActivity().runOnUiThread(() -> {
-                    setLoading(false);
-                    Toast.makeText(requireContext(), "Cập nhật thành công", Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(requireView()).popBackStack();
-                });
+                Toast.makeText(getContext(), "Cập nhật thành công!", Toast.LENGTH_SHORT).show();
+                Navigation.findNavController(view).navigate(R.id.nav_profile);
             }
 
             @Override
             public void onError(String message) {
-                if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> {
-                    setLoading(false);
-                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show();
-                });
+                Toast.makeText(getContext(), "Cập nhật thất bại: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void setLoading(boolean loading) {
-        btnSave.setEnabled(!loading);
-        btnSave.setText(loading ? "Đang lưu..." : getString(R.string.save));
+    private void openGallery() {
+        pickImageLauncher.launch("image/*");
     }
+
+    private final ActivityResultLauncher<String> pickImageLauncher = registerForActivityResult(
+            new ActivityResultContracts.GetContent(),
+            uri -> {
+                if (uri != null) {
+                    selectedImageUri = uri;
+                    Glide.with(this).load(uri).into(ivAvatar);
+                }
+            }
+    );
 }

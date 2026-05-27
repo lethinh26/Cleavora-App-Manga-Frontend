@@ -14,7 +14,6 @@ public class ApiClient {
 
     private static final String BASE_URL = BuildConfig.BASE_URL;
     private static final int TIMEOUT = 30;
-
     private static Retrofit retrofit;
 
     public static Retrofit getInstance(android.content.Context context) {
@@ -35,6 +34,7 @@ public class ApiClient {
                         if (token != null) {
                             builder.header("Authorization", "Bearer " + token);
                         }
+                        builder.header("Content-Type", "application/json");
 
                         return chain.proceed(builder.build());
                     })
