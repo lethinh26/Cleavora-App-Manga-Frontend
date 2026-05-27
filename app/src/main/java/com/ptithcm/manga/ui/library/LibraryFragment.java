@@ -8,7 +8,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.ptithcm.manga.R;
 
 public class LibraryFragment extends Fragment {
@@ -23,6 +26,25 @@ public class LibraryFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        // TODO: Setup TabLayout with ViewPager2 (Favorites, Following, History)
+
+        TabLayout tabLayout = view.findViewById(R.id.tab_layout);
+        ViewPager2 viewPager = view.findViewById(R.id.view_pager);
+
+        LibraryPagerAdapter pagerAdapter = new LibraryPagerAdapter(requireActivity());
+        viewPager.setAdapter(pagerAdapter);
+
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+            switch (position) {
+                case 0:
+                    tab.setText(R.string.tab_favorites);
+                    break;
+                case 1:
+                    tab.setText(R.string.tab_following);
+                    break;
+                case 2:
+                    tab.setText(R.string.tab_history);
+                    break;
+            }
+        }).attach();
     }
 }
