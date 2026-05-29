@@ -22,7 +22,7 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.View
     private OnMangaClickListener listener;
 
     public interface OnMangaClickListener {
-        void onMangaClick(int mangaId);
+        void onMangaClick(MangaResponse manga);
     }
 
     public MangaCardAdapter(OnMangaClickListener listener) {
@@ -59,7 +59,7 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.View
         }
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onMangaClick(manga.getId());
+                listener.onMangaClick(manga);
             }
         });
     }

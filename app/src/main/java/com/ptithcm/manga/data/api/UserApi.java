@@ -1,5 +1,6 @@
 package com.ptithcm.manga.data.api;
 
+import com.ptithcm.manga.data.model.request.ChangePassRequest;
 import com.ptithcm.manga.data.model.request.ProfileRequest;
 import com.ptithcm.manga.data.model.response.ApiResponse;
 import com.ptithcm.manga.data.model.response.UserResponse;
@@ -16,4 +17,7 @@ public interface UserApi {
 
     @PUT("v1/me/profile")
     Call<ApiResponse<UserResponse>> updateProfile(@Body ProfileRequest request);
+
+    @PUT("v1/me/password")
+    Call<ApiResponse<Void>> changePassword(@Body ChangePassRequest request);
 }

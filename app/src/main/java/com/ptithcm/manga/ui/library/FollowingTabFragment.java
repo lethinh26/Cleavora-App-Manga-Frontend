@@ -47,9 +47,9 @@ public class FollowingTabFragment extends Fragment {
 
         mangaRepository = new MangaRepository(requireContext());
 
-        adapter = new MangaCardAdapter(mangaId -> {
+        adapter = new MangaCardAdapter(manga -> {
             Bundle args = new Bundle();
-            args.putInt("mangaId", mangaId);
+            args.putString("mangaSlug", manga.getSlug());
             Navigation.findNavController(requireView())
                     .navigate(R.id.action_library_to_manga_detail, args);
         });

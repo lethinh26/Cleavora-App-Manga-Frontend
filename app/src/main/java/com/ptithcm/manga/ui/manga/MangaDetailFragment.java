@@ -57,6 +57,7 @@ public class MangaDetailFragment extends Fragment {
     private int likeCount = 0;
     private int followCount = 0;
     private boolean userStatusLoaded = false;
+    private List<ChapterResponse> currentChapters = new ArrayList<>();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -139,6 +140,8 @@ public class MangaDetailFragment extends Fragment {
             if (!ensureLoggedIn() || !ensureMangaId()) return;
             toggleFollow();
         });
+
+        btnStartReading.setOnClickListener(v -> openFirstChapter());
     }
 
     private void setupAuthState() {
@@ -232,13 +235,8 @@ public class MangaDetailFragment extends Fragment {
             genreAdapter.setGenres(genreResponses);
         }
 
-        if (manga.getTotalChapters() != null && manga.getTotalChapters() > 0) {
-            btnStartReading.setText("Đọc ngay (Chương 1)");
-            btnStartReading.setEnabled(true);
-        } else {
-            btnStartReading.setText("Chưa có chương nào");
-            btnStartReading.setEnabled(false);
-        }
+        btnStartReading.setText("Đang tải chương...");
+        btnStartReading.setEnabled(false);
     }
 
     private void loadChapters() {
@@ -247,18 +245,42 @@ public class MangaDetailFragment extends Fragment {
             @Override
             public void onSuccess(List<ChapterResponse> result) {
                 runOnUiThreadSafe(() -> {
-                    if (result != null) {
-                        chapterAdapter.setChapters(result);
-                    }
+                    currentChapters = result != null ? result : new ArrayList<>();
+                    chapterAdapter.setChapters(currentChapters);
+                    updateStartReadingButton();
                 });
             }
 
             @Override
             public void onError(String message) {
-                runOnUiThreadSafe(() -> Toast.makeText(getContext(), "Lỗi tải chapters: " + message, Toast.LENGTH_SHORT).show());
+                runOnUiThreadSafe(() -> {
+                    currentChapters = new ArrayList<>();
+                    updateStartReadingButton();
+                    Toast.makeText(getContext(), "Lỗi tải chapters: " + message, Toast.LENGTH_SHORT).show();
+                });
             }
         });
     }
+
+    private void updateStartReadingButton() {
+        if (currentChapters != null && !currentChapters.isEmpty()) {
+            ChapterResponse chapter = currentChapters.get(currentChapters.size() - 1);
+            btnStartReading.setText("Đọc ngay (Chương " + chapter.getChapterNumber() + ")");
+            btnStartReading.setEnabled(true);
+        } else {
+            btnStartReading.setText("Chưa có chương nào");
+            btnStartReading.setEnabled(false);
+        }
+    }
+
+    private void openFirstChapter() {
+        if (currentChapters == null || currentChapters.isEmpty()) return;
+        ChapterResponse chapter = currentChapters.get(currentChapters.size() - 1);
+        Intent intent = new Intent(requireContext(), ReaderActivity.class);
+        intent.putExtra("CHAPTER_ID", chapter.getId());
+        startActivity(intent);
+    }
+
 
     private void loadUserStatusIfPossible() {
         if (!tokenManager.isLoggedIn()) return;

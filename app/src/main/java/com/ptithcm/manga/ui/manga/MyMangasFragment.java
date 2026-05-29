@@ -20,6 +20,7 @@ import com.ptithcm.manga.adapter.manga.MangaCardAdapter;
 import com.ptithcm.manga.data.model.response.MangaResponse;
 import com.ptithcm.manga.data.model.response.PageResponse;
 import com.ptithcm.manga.data.repository.MangaRepository;
+import com.ptithcm.manga.util.BackButtonHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,7 @@ public class MyMangasFragment extends Fragment implements MangaCardAdapter.OnMan
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        BackButtonHelper.addBackButton(this, view);
 
         mangaRepository = new MangaRepository(requireContext());
 

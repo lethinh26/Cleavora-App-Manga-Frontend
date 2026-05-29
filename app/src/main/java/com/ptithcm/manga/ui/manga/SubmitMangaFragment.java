@@ -30,6 +30,7 @@ import com.ptithcm.manga.data.model.response.MangaResponse;
 import com.ptithcm.manga.data.model.response.UploadResponse;
 import com.ptithcm.manga.data.repository.CloudRepository;
 import com.ptithcm.manga.data.repository.MangaRepository;
+import com.ptithcm.manga.util.BackButtonHelper;
 
 import java.text.Normalizer;
 import java.util.List;
@@ -65,6 +66,7 @@ public class SubmitMangaFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        BackButtonHelper.addBackButton(this, view);
 
         mangaRepository = new MangaRepository(requireContext());
         cloudRepository = new CloudRepository();

@@ -25,6 +25,7 @@ import com.ptithcm.manga.data.model.response.UploadResponse;
 import com.ptithcm.manga.data.model.response.UserResponse;
 import com.ptithcm.manga.data.repository.CloudRepository;
 import com.ptithcm.manga.data.repository.UserRepository;
+import com.ptithcm.manga.util.BackButtonHelper;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -54,6 +55,7 @@ public class EditProfileFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        BackButtonHelper.addBackButton(this, view);
         cloudRepository = new CloudRepository();
         userRepository = new UserRepository(requireContext());
         userRepository = new UserRepository(requireContext());

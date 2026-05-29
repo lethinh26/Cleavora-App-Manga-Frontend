@@ -25,6 +25,7 @@
             android:id="@+id/btn_back"
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:background="@drawable/bg_rounded_surface"
             android:contentDescription="back"
             android:padding="@dimen/spacing_sm"
             android:src="@android:drawable/ic_menu_revert" />

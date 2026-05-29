@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.gson.Gson;
 import com.ptithcm.manga.data.api.ApiClient;
 import com.ptithcm.manga.data.api.UserApi;
+import com.ptithcm.manga.data.model.request.ChangePassRequest;
 import com.ptithcm.manga.data.model.request.ProfileRequest;
 import com.ptithcm.manga.data.model.response.ApiResponse;
 import com.ptithcm.manga.data.model.response.UserResponse;
@@ -68,6 +69,30 @@ public class UserRepository {
 
             @Override
             public void onFailure(Call<ApiResponse<UserResponse>> call, Throwable throwable) {
+                callback.onError("Lỗi kết nối: " + throwable.getMessage());
+            }
+        });
+    }
+
+    public void changePassword(String oldPassword, String newPassword, UserCallback<Void> callback) {
+        ChangePassRequest request = new ChangePassRequest(oldPassword, newPassword);
+        userApi.changePassword(request).enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<Void> body = response.body();
+                    if (body.isSuccess()) {
+                        callback.onSuccess(null);
+                    } else {
+                        callback.onError(body.getMessage() != null ? body.getMessage() : "Đổi mật khẩu thất bại");
+                    }
+                } else {
+                    callback.onError("Đổi mật khẩu thất bại");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable throwable) {
                 callback.onError("Lỗi kết nối: " + throwable.getMessage());
             }
         });

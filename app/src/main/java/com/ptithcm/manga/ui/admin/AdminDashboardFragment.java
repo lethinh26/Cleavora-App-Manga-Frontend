@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.ptithcm.manga.R;
+import com.ptithcm.manga.util.BackButtonHelper;
 
 public class AdminDashboardFragment extends Fragment {
 
@@ -23,6 +24,7 @@ public class AdminDashboardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        BackButtonHelper.addBackButton(this, view);
         // TODO: Load stats, setup menu navigation
     }
 }
