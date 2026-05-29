@@ -30,6 +30,11 @@ import com.ptithcm.manga.data.repository.MangaRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.content.Intent;
+import com.ptithcm.manga.adapter.manga.ChapterAdapter;
+import com.ptithcm.manga.data.model.response.ChapterResponse;
+import com.ptithcm.manga.data.repository.ChapterRepository;
+import com.ptithcm.manga.ui.reader.ReaderActivity;
 
 public class MangaDetailFragment extends Fragment {
 
@@ -44,6 +49,8 @@ public class MangaDetailFragment extends Fragment {
     private RecyclerView rvGenres, rvChapters;
     private MaterialButton btnLike, btnFollow, btnStartReading;
     private GenreChipAdapter genreAdapter;
+    private ChapterRepository chapterRepository;
+    private ChapterAdapter chapterAdapter;
 
     private boolean isLiked = false;
     private boolean isFollowed = false;
@@ -58,6 +65,9 @@ public class MangaDetailFragment extends Fragment {
         if (getArguments() != null) {
             mangaSlug = getArguments().getString("mangaSlug");
             mangaId = getArguments().getInt("mangaId", -1);
+            if ((mangaSlug == null || mangaSlug.trim().isEmpty()) && getArguments().containsKey("mangaSlug")) {
+                mangaSlug = getArguments().getString("mangaSlug");
+            }
         }
     }
 
@@ -74,13 +84,13 @@ public class MangaDetailFragment extends Fragment {
 
         mangaRepository = new MangaRepository(requireContext());
         tokenManager = TokenManager.getInstance(requireContext());
+        chapterRepository = new ChapterRepository(requireContext());
 
         initViews(view);
         setupListeners();
         setupAuthState();
 
         loadMangaDetail();
-        loadUserStatusIfPossible();
     }
 
     private void initViews(View view) {
@@ -107,6 +117,14 @@ public class MangaDetailFragment extends Fragment {
                 new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false)
         );
         rvGenres.setAdapter(genreAdapter);
+
+        chapterAdapter = new ChapterAdapter(chapter -> {
+            Intent intent = new Intent(requireContext(), ReaderActivity.class);
+            intent.putExtra("CHAPTER_ID", chapter.getId());
+            startActivity(intent);
+        });
+        rvChapters.setLayoutManager(new LinearLayoutManager(getContext()));
+        rvChapters.setAdapter(chapterAdapter);
     }
 
     private void setupListeners() {
@@ -147,6 +165,11 @@ public class MangaDetailFragment extends Fragment {
         return false;
     }
 
+    private void loadDependentData() {
+        loadUserStatusIfPossible();
+        loadChapters();
+    }
+
     private void loadMangaDetail() {
         if (mangaSlug == null || mangaSlug.trim().isEmpty()) return;
 
@@ -156,6 +179,7 @@ public class MangaDetailFragment extends Fragment {
                 runOnUiThreadSafe(() -> {
                     if (data == null) return;
                     bindData(data);
+                    loadDependentData();
                 });
             }
 
@@ -173,6 +197,10 @@ public class MangaDetailFragment extends Fragment {
     }
 
     private void bindData(MangaResponse manga) {
+        if (manga.getId() != null && manga.getId() > 0) {
+            mangaId = manga.getId();
+        }
+
         tvTitle.setText(manga.getTitle());
         tvAuthor.setText("Tác giả: " +
                 (manga.getAuthorName() != null ? manga.getAuthorName() : "Đang cập nhật"));
@@ -211,6 +239,25 @@ public class MangaDetailFragment extends Fragment {
             btnStartReading.setText("Chưa có chương nào");
             btnStartReading.setEnabled(false);
         }
+    }
+
+    private void loadChapters() {
+        if (mangaId <= 0) return;
+        chapterRepository.getChaptersByMangaId(mangaId, new ChapterRepository.RepositoryCallback<List<ChapterResponse>>() {
+            @Override
+            public void onSuccess(List<ChapterResponse> result) {
+                runOnUiThreadSafe(() -> {
+                    if (result != null) {
+                        chapterAdapter.setChapters(result);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String message) {
+                runOnUiThreadSafe(() -> Toast.makeText(getContext(), "Lỗi tải chapters: " + message, Toast.LENGTH_SHORT).show());
+            }
+        });
     }
 
     private void loadUserStatusIfPossible() {
