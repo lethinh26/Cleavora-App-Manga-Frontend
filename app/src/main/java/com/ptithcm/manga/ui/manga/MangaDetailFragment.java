@@ -65,6 +65,9 @@ public class MangaDetailFragment extends Fragment {
         if (getArguments() != null) {
             mangaSlug = getArguments().getString("mangaSlug");
             mangaId = getArguments().getInt("mangaId", -1);
+            if ((mangaSlug == null || mangaSlug.trim().isEmpty()) && getArguments().containsKey("mangaSlug")) {
+                mangaSlug = getArguments().getString("mangaSlug");
+            }
         }
     }
 
@@ -88,8 +91,6 @@ public class MangaDetailFragment extends Fragment {
         setupAuthState();
 
         loadMangaDetail();
-        loadUserStatusIfPossible();
-        loadChapters();
     }
 
     private void initViews(View view) {
@@ -164,6 +165,11 @@ public class MangaDetailFragment extends Fragment {
         return false;
     }
 
+    private void loadDependentData() {
+        loadUserStatusIfPossible();
+        loadChapters();
+    }
+
     private void loadMangaDetail() {
         if (mangaSlug == null || mangaSlug.trim().isEmpty()) return;
 
@@ -173,6 +179,7 @@ public class MangaDetailFragment extends Fragment {
                 runOnUiThreadSafe(() -> {
                     if (data == null) return;
                     bindData(data);
+                    loadDependentData();
                 });
             }
 
@@ -190,6 +197,10 @@ public class MangaDetailFragment extends Fragment {
     }
 
     private void bindData(MangaResponse manga) {
+        if (manga.getId() != null && manga.getId() > 0) {
+            mangaId = manga.getId();
+        }
+
         tvTitle.setText(manga.getTitle());
         tvAuthor.setText("Tác giả: " +
                 (manga.getAuthorName() != null ? manga.getAuthorName() : "Đang cập nhật"));
