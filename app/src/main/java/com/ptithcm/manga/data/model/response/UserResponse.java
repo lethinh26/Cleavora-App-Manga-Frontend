@@ -14,6 +14,8 @@ public class UserResponse {
 
     private String role;
 
+    private Boolean active;
+
     private String createdAt;
 
     public int getId() { return id; }
@@ -21,5 +23,6 @@ public class UserResponse {
     public String getDisplayName() { return displayName; }
     public String getAvatarUrl() { return avatarUrl; }
     public String getRole() { return role; }
+    public Boolean getActive() { return active; }
     public String getCreatedAt() { return createdAt; }
 }
