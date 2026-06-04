@@ -14,13 +14,86 @@
         android:textSize="24sp"
         android:textStyle="bold" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_mangas"
+    <!-- Filter Chips -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="@dimen/spacing_lg"
+            android:paddingBottom="@dimen/spacing_sm">
+
+            <TextView
+                android:id="@+id/chip_all"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:background="@drawable/bg_chip_active"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:text="Tất cả"
+                android:textColor="@color/on_primary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/chip_approved"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:background="@drawable/bg_chip"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:text="@string/status_approved"
+                android:textColor="@color/subtext"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/chip_pending"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:background="@drawable/bg_chip"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:text="@string/status_pending"
+                android:textColor="@color/subtext"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/chip_rejected"
+                android:layout_width="wrap_content"
+                android:layout_height="32dp"
+                android:layout_marginStart="@dimen/spacing_sm"
+                android:background="@drawable/bg_chip"
+                android:gravity="center"
+                android:paddingHorizontal="@dimen/spacing_md"
+                android:text="@string/status_rejected"
+                android:textColor="@color/subtext"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:padding="@dimen/spacing_lg" />
+        android:layout_weight="1">
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_mangas"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:padding="@dimen/spacing_lg" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </FrameLayout>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_add_manga"
