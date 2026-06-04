@@ -78,6 +78,23 @@ public class ChapterRepository {
         });
     }
 
+    public void createChapter(int mangaId, com.ptithcm.manga.data.model.request.ChapterRequest request, final RepositoryCallback<ChapterResponse> callback) {
+        chapterApi.createChapter(mangaId, request).enqueue(new Callback<ApiResponse<ChapterResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ChapterResponse>> call, Response<ApiResponse<ChapterResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    callback.onSuccess(response.body().getData());
+                } else {
+                    callback.onError(response.body() != null ? response.body().getMessage() : "Failed to create chapter");
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse<ChapterResponse>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     public interface RepositoryCallback<T> {
         void onSuccess(T result);
         void onError(String message);

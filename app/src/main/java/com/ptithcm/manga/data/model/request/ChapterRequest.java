@@ -19,6 +19,7 @@ public class ChapterRequest {
     public void setTitle(String title) { this.title = title; }
     public double getChapterNumber() { return chapterNumber; }
     public void setChapterNumber(double chapterNumber) { this.chapterNumber = chapterNumber; }
+
     public List<String> getImageUrls() { return imageUrls; }
     public void setImageUrls(List<String> imageUrls) { this.imageUrls = imageUrls; }
 }

@@ -20,4 +20,10 @@ public interface ChapterApi {
 
     @POST("v1/chapters/{chapterId}/view")
     Call<ApiResponse<String>> incrementViewCount(@Path("chapterId") int chapterId);
+
+    @POST("v1/admin/mangas/{mangaId}/chapters")
+    Call<ApiResponse<ChapterResponse>> createChapter(
+            @Path("mangaId") int mangaId,
+            @retrofit2.http.Body com.ptithcm.manga.data.model.request.ChapterRequest request
+    );
 }

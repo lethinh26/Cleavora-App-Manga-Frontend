@@ -15,6 +15,7 @@ public class UserResponse {
     private String role;
 
     private Boolean active;
+
     private String createdAt;
 
     public int getId() { return id; }
