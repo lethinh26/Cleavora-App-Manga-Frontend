@@ -13,6 +13,10 @@
     <color name="on_primary">#FF0B0F0C</color>
     <color name="ripple">#2222C55E</color>
 
+    <color name="success">#FF22C55E</color>
+    <color name="warning">#FFF59E0B</color>
+    <color name="status_inactive">#FF6B7280</color>
+
     <color name="splash_bg">#FF0B0F0C</color>
 
     <color name="black">#FF000000</color>

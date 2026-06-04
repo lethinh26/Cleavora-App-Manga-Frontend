@@ -59,6 +59,9 @@ public class AdminMangaFormFragment extends Fragment {
     private String coverUrl;
     private int mangaId = -1; // -1 = create mode
     private final Set<Integer> selectedGenreIds = new HashSet<>();
+    // Dùng để handle race condition giữa 2 API loadGenres và loadMangaData
+    private Set<String> pendingGenreNames = null;   // Tên genre cần pre-select
+    private List<GenreResponse> loadedGenres = null; // Danh sách genre đã load
 
     private final ActivityResultLauncher<Intent> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -136,7 +139,12 @@ public class AdminMangaFormFragment extends Fragment {
             @Override
             public void onSuccess(List<GenreResponse> data) {
                 if (!isAdded()) return;
-                requireActivity().runOnUiThread(() -> genreAdapter.setGenres(data));
+                requireActivity().runOnUiThread(() -> {
+                    loadedGenres = data;
+                    genreAdapter.setGenres(data);
+                    // Nếu manga data đã load xong trước, map ngay
+                    applyPendingGenreSelection();
+                });
             }
 
             @Override
@@ -144,6 +152,22 @@ public class AdminMangaFormFragment extends Fragment {
                 // silently fail, genres are optional for form rendering
             }
         });
+    }
+
+    /**
+     * Map tên thể loại (Set<String>) sang ID và pre-select trong adapter.
+     * Chỉ được gọi khi cả 2 loadedGenres và pendingGenreNames đã sẵn sàng.
+     */
+    private void applyPendingGenreSelection() {
+        if (pendingGenreNames == null || loadedGenres == null) return;
+        Set<Integer> idsToSelect = new HashSet<>();
+        for (GenreResponse genre : loadedGenres) {
+            if (pendingGenreNames.contains(genre.getName())) {
+                idsToSelect.add(genre.getId());
+            }
+        }
+        genreAdapter.setSelectedIds(idsToSelect);
+        pendingGenreNames = null;
     }
 
     private void loadMangaData(int id) {
@@ -169,6 +193,12 @@ public class AdminMangaFormFragment extends Fragment {
                     if (coverUrl != null && !coverUrl.isEmpty()) {
                         Glide.with(requireContext()).load(coverUrl)
                                 .placeholder(R.drawable.bg_placeholder_cover).into(ivCover);
+                    }
+
+                    // Lưu tên genre để pre-select; nếu genres đã load xong thì map ngay
+                    if (data.getGenres() != null && !data.getGenres().isEmpty()) {
+                        pendingGenreNames = new HashSet<>(data.getGenres());
+                        applyPendingGenreSelection();
                     }
                 });
             }

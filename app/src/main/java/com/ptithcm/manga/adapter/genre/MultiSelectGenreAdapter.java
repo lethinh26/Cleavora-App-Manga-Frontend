@@ -28,6 +28,13 @@ public class MultiSelectGenreAdapter extends RecyclerView.Adapter<MultiSelectGen
         notifyDataSetChanged();
     }
 
+    /** Pre-select các thể loại khi ở edit mode */
+    public void setSelectedIds(Set<Integer> ids) {
+        selectedIds.clear();
+        if (ids != null) selectedIds.addAll(ids);
+        notifyDataSetChanged();
+    }
+
     public Set<Integer> getSelectedIds() {
         return selectedIds;
     }
@@ -45,8 +52,9 @@ public class MultiSelectGenreAdapter extends RecyclerView.Adapter<MultiSelectGen
         GenreResponse genre = genres.get(position);
         holder.tvGenreName.setText(genre.getName());
 
+        // Luôn đọc trạng thái mới nhất từ Set, tránh cache sai
         boolean isSelected = selectedIds.contains(genre.getId());
-        
+
         if (isSelected) {
             holder.tvGenreName.setBackgroundResource(R.drawable.bg_chip_active);
             holder.tvGenreName.setTextColor(Color.WHITE);
@@ -56,7 +64,8 @@ public class MultiSelectGenreAdapter extends RecyclerView.Adapter<MultiSelectGen
         }
 
         holder.itemView.setOnClickListener(v -> {
-            if (isSelected) {
+            // Đọc lại trạng thái hiện tại tại thời điểm click (không dùng biến cache)
+            if (selectedIds.contains(genre.getId())) {
                 selectedIds.remove(genre.getId());
             } else {
                 selectedIds.add(genre.getId());
