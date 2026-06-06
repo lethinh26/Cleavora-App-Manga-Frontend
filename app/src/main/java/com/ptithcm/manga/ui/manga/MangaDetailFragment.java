@@ -26,7 +26,9 @@ import com.ptithcm.manga.data.model.response.GenreResponse;
 import com.ptithcm.manga.data.model.response.LikeResponse;
 import com.ptithcm.manga.data.model.response.LikeStatusResponse;
 import com.ptithcm.manga.data.model.response.MangaResponse;
+import com.ptithcm.manga.data.model.response.ReadingHistoryResponse;
 import com.ptithcm.manga.data.repository.MangaRepository;
+import com.ptithcm.manga.data.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,10 +49,11 @@ public class MangaDetailFragment extends Fragment {
     private ImageView ivCover, btnBack;
     private TextView tvTitle, tvAuthor, tvStatus, tvViews, tvLikes, tvFollows, tvDescription;
     private RecyclerView rvGenres, rvChapters;
-    private MaterialButton btnLike, btnFollow, btnStartReading;
+    private MaterialButton btnLike, btnFollow, btnStartReading, btnContinueReading;
     private GenreChipAdapter genreAdapter;
     private ChapterRepository chapterRepository;
     private ChapterAdapter chapterAdapter;
+    private UserRepository userRepository;
 
     private boolean isLiked = false;
     private boolean isFollowed = false;
@@ -85,6 +88,7 @@ public class MangaDetailFragment extends Fragment {
         mangaRepository = new MangaRepository(requireContext());
         tokenManager = TokenManager.getInstance(requireContext());
         chapterRepository = new ChapterRepository(requireContext());
+        userRepository = new UserRepository(requireContext());
 
         initViews(view);
         setupListeners();
@@ -111,6 +115,7 @@ public class MangaDetailFragment extends Fragment {
         btnLike = view.findViewById(R.id.btn_like);
         btnFollow = view.findViewById(R.id.btn_follow);
         btnStartReading = view.findViewById(R.id.btn_start_reading);
+        btnContinueReading = view.findViewById(R.id.btn_continue_reading);
 
         genreAdapter = new GenreChipAdapter();
         rvGenres.setLayoutManager(
@@ -121,6 +126,7 @@ public class MangaDetailFragment extends Fragment {
         chapterAdapter = new ChapterAdapter(chapter -> {
             Intent intent = new Intent(requireContext(), ReaderActivity.class);
             intent.putExtra("CHAPTER_ID", chapter.getId());
+            intent.putExtra("MANGA_ID", mangaId);
             startActivity(intent);
         });
         rvChapters.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -138,6 +144,19 @@ public class MangaDetailFragment extends Fragment {
         btnFollow.setOnClickListener(v -> {
             if (!ensureLoggedIn() || !ensureMangaId()) return;
             toggleFollow();
+        });
+
+        // B1: Add btnStartReading click listener to open first chapter
+        btnStartReading.setOnClickListener(v -> {
+            List<ChapterResponse> chapters = chapterAdapter.getChapters();
+            if (chapters != null && !chapters.isEmpty()) {
+                Intent intent = new Intent(requireContext(), ReaderActivity.class);
+                intent.putExtra("CHAPTER_ID", chapters.get(0).getId());
+                intent.putExtra("MANGA_ID", mangaId);
+                startActivity(intent);
+            } else {
+                Toast.makeText(requireContext(), "Đang tải danh sách chương...", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
@@ -168,30 +187,50 @@ public class MangaDetailFragment extends Fragment {
     private void loadDependentData() {
         loadUserStatusIfPossible();
         loadChapters();
+        checkReadingProgress();
     }
 
+    // B2: Fallback to loadById when mangaSlug is null/empty
     private void loadMangaDetail() {
-        if (mangaSlug == null || mangaSlug.trim().isEmpty()) return;
+        if (mangaSlug != null && !mangaSlug.trim().isEmpty()) {
+            loadBySlug(mangaSlug);
+        } else if (mangaId > 0) {
+            loadById(mangaId);
+        }
+    }
 
-        mangaRepository.getMangaBySlug(mangaSlug, new MangaRepository.MangaCallback<MangaResponse>() {
+    private void loadBySlug(String slug) {
+        mangaRepository.getMangaBySlug(slug, new MangaRepository.MangaCallback<MangaResponse>() {
             @Override
             public void onSuccess(MangaResponse data) {
-                runOnUiThreadSafe(() -> {
-                    if (data == null) return;
-                    bindData(data);
-                    loadDependentData();
-                });
+                if (!isAdded() || data == null) return;
+                bindData(data);
+                loadDependentData();
             }
 
             @Override
             public void onError(String message) {
-                runOnUiThreadSafe(() ->
-                        Toast.makeText(
-                                getContext(),
-                                message != null ? message : "Lỗi tải chi tiết truyện",
-                                Toast.LENGTH_SHORT
-                        ).show()
-                );
+                if (!isAdded()) return;
+                Toast.makeText(getContext(), message != null ? message : "Lỗi tải chi tiết truyện", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadById(int id) {
+        mangaRepository.getMangaById(id, new MangaRepository.MangaCallback<MangaResponse>() {
+            @Override
+            public void onSuccess(MangaResponse data) {
+                if (!isAdded() || data == null) return;
+                // Also set slug from response so future navigation can use it
+                mangaSlug = data.getSlug();
+                bindData(data);
+                loadDependentData();
+            }
+
+            @Override
+            public void onError(String message) {
+                if (!isAdded()) return;
+                Toast.makeText(getContext(), message != null ? message : "Lỗi tải chi tiết truyện", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -246,16 +285,22 @@ public class MangaDetailFragment extends Fragment {
         chapterRepository.getChaptersByMangaId(mangaId, new ChapterRepository.RepositoryCallback<List<ChapterResponse>>() {
             @Override
             public void onSuccess(List<ChapterResponse> result) {
-                runOnUiThreadSafe(() -> {
-                    if (result != null) {
-                        chapterAdapter.setChapters(result);
-                    }
-                });
+                if (!isAdded()) return;
+                if (result != null && !result.isEmpty()) {
+                    chapterAdapter.setChapters(result);
+                    // Update button state based on actual loaded chapters (not manga.totalChapters)
+                    btnStartReading.setText("Đọc ngay (Chương 1)");
+                    btnStartReading.setEnabled(true);
+                } else {
+                    btnStartReading.setText("Chưa có chương nào");
+                    btnStartReading.setEnabled(false);
+                }
             }
 
             @Override
             public void onError(String message) {
-                runOnUiThreadSafe(() -> Toast.makeText(getContext(), "Lỗi tải chapters: " + message, Toast.LENGTH_SHORT).show());
+                if (!isAdded()) return;
+                Toast.makeText(getContext(), "Lỗi tải chapters: " + message, Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -276,11 +321,9 @@ public class MangaDetailFragment extends Fragment {
         mangaRepository.getLikeStatus(mangaId, new MangaRepository.MangaCallback<LikeStatusResponse>() {
             @Override
             public void onSuccess(LikeStatusResponse data) {
-                runOnUiThreadSafe(() -> {
-                    if (data == null) return;
-                    isLiked = data.isLiked();
-                    updateLikeButton();
-                });
+                if (!isAdded() || data == null) return;
+                isLiked = data.isLiked();
+                updateLikeButton();
             }
 
             @Override
@@ -296,16 +339,14 @@ public class MangaDetailFragment extends Fragment {
         mangaRepository.toggleLike(mangaId, new MangaRepository.MangaCallback<LikeResponse>() {
             @Override
             public void onSuccess(LikeResponse data) {
-                runOnUiThreadSafe(() -> {
-                    if (data == null) return;
+                if (!isAdded() || data == null) return;
 
-                    isLiked = data.isLiked();
-                    likeCount = data.getLikeCount();
+                isLiked = data.isLiked();
+                likeCount = data.getLikeCount();
 
-                    updateLikeButton();
-                    tvLikes.setText(String.valueOf(likeCount));
-                    btnLike.setEnabled(true);
-                });
+                updateLikeButton();
+                tvLikes.setText(String.valueOf(likeCount));
+                btnLike.setEnabled(true);
             }
 
             @Override
@@ -338,11 +379,9 @@ public class MangaDetailFragment extends Fragment {
         mangaRepository.getFollowStatus(mangaId, new MangaRepository.MangaCallback<FollowStatusResponse>() {
             @Override
             public void onSuccess(FollowStatusResponse data) {
-                runOnUiThreadSafe(() -> {
-                    if (data == null) return;
-                    isFollowed = data.isFollowed();
-                    updateFollowButton();
-                });
+                if (!isAdded() || data == null) return;
+                isFollowed = data.isFollowed();
+                updateFollowButton();
             }
 
             @Override
@@ -358,16 +397,14 @@ public class MangaDetailFragment extends Fragment {
         mangaRepository.toggleFollow(mangaId, new MangaRepository.MangaCallback<FollowResponse>() {
             @Override
             public void onSuccess(FollowResponse data) {
-                runOnUiThreadSafe(() -> {
-                    if (data == null) return;
+                if (!isAdded() || data == null) return;
 
-                    isFollowed = data.isFollowed();
-                    followCount = data.getFollowCount();
+                isFollowed = data.isFollowed();
+                followCount = data.getFollowCount();
 
-                    updateFollowButton();
-                    tvFollows.setText(String.valueOf(followCount));
-                    btnFollow.setEnabled(true);
-                });
+                updateFollowButton();
+                tvFollows.setText(String.valueOf(followCount));
+                btnFollow.setEnabled(true);
             }
 
             @Override
@@ -394,9 +431,40 @@ public class MangaDetailFragment extends Fragment {
         }
     }
 
+    // ============ CONTINUE READING ============
+
+    private void checkReadingProgress() {
+        if (!tokenManager.isLoggedIn() || mangaId <= 0) {
+            btnContinueReading.setVisibility(View.GONE);
+            return;
+        }
+
+        userRepository.getReadingProgress(mangaId, new UserRepository.UserCallback<ReadingHistoryResponse>() {
+            @Override
+            public void onSuccess(ReadingHistoryResponse data) {
+                if (!isAdded() || data == null) return;
+                btnContinueReading.setVisibility(View.VISIBLE);
+                btnContinueReading.setText("Tiếp tục đọc - Chương " + data.getChapterId());
+                btnContinueReading.setOnClickListener(v -> {
+                    Intent intent = new Intent(requireContext(), ReaderActivity.class);
+                    intent.putExtra("MANGA_ID", data.getMangaId());
+                    intent.putExtra("CHAPTER_ID", data.getChapterId());
+                    intent.putExtra("LAST_PAGE", data.getLastPage());
+                    startActivity(intent);
+                });
+                btnStartReading.setText("Đọc từ đầu");
+            }
+
+            @Override
+            public void onError(String message) {
+                if (!isAdded()) return;
+                btnContinueReading.setVisibility(View.GONE);
+            }
+        });
+    }
+
     private void runOnUiThreadSafe(Runnable action) {
         if (!isAdded()) return;
-
         requireActivity().runOnUiThread(() -> {
             if (isAdded()) {
                 action.run();

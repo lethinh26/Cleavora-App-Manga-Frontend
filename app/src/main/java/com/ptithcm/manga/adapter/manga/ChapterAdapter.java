@@ -33,6 +33,10 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
         notifyDataSetChanged();
     }
 
+    public List<ChapterResponse> getChapters() {
+        return chapterList;
+    }
+
     @NonNull
     @Override
     public ChapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,7 +48,7 @@ public class ChapterAdapter extends RecyclerView.Adapter<ChapterAdapter.ChapterV
     public void onBindViewHolder(@NonNull ChapterViewHolder holder, int position) {
         ChapterResponse chapter = chapterList.get(position);
         
-        holder.tvChapterNumber.setText("Chương " + chapter.getChapterNumber());
+        holder.tvChapterNumber.setText("Chương " + com.ptithcm.manga.util.ChapterFormatter.format(chapter.getChapterNumber()));
         if (chapter.getTitle() != null && !chapter.getTitle().isEmpty()) {
             holder.tvChapterTitle.setText(chapter.getTitle());
             holder.tvChapterTitle.setVisibility(View.VISIBLE);

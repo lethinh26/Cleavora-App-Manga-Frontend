@@ -32,6 +32,8 @@ public class LibraryFragment extends Fragment {
 
         LibraryPagerAdapter pagerAdapter = new LibraryPagerAdapter(requireActivity());
         viewPager.setAdapter(pagerAdapter);
+        // Giữ tất cả fragment trong memory để onResume được gọi đúng khi chuyển tab
+        viewPager.setOffscreenPageLimit(3);
 
         new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
             switch (position) {

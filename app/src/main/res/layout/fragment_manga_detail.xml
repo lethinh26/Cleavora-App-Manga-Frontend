@@ -210,13 +210,24 @@
                 android:textColor="@color/subtext"
                 android:textSize="14sp" />
 
+            <!-- Continue Reading Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_continue_reading"
+                style="@style/Widget.Manga.Button.Secondary"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="@dimen/spacing_xl"
+                android:text="Tiếp tục đọc"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
             <!-- Start Reading Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_start_reading"
                 style="@style/Widget.Manga.Button.Primary"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:layout_marginTop="@dimen/spacing_xl"
+                android:layout_marginTop="@dimen/spacing_sm"
                 android:text="@string/start_reading"
                 android:textSize="16sp" />
 

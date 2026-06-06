@@ -45,6 +45,16 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.Mang
         MangaResponse currentManga = mangaList.get(position);
         holder.tvTitle.setText(currentManga.getTitle());
 
+        // Hiển thị số chương thực tế thay vì text hardcoded "Chương 10"
+        if (holder.tvChapterCount != null) {
+            Integer total = currentManga.getTotalChapters();
+            if (total != null && total > 0) {
+                holder.tvChapterCount.setText("Chương " + total);
+            } else {
+                holder.tvChapterCount.setText("Chưa có chương");
+            }
+        }
+
         Glide.with(holder.itemView.getContext())
                 .load(currentManga.getCoverImageUrl())
                 .placeholder(R.drawable.bg_placeholder_cover)
@@ -67,11 +77,13 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.Mang
     public static class MangaViewHolder extends RecyclerView.ViewHolder {
         ImageView ivCover;
         TextView tvTitle;
+        TextView tvChapterCount;
 
         public MangaViewHolder(@NonNull View itemView) {
             super(itemView);
             ivCover = itemView.findViewById(R.id.iv_cover);
             tvTitle = itemView.findViewById(R.id.tv_title);
+            tvChapterCount = itemView.findViewById(R.id.tv_chapter_count);
         }
     }
 }

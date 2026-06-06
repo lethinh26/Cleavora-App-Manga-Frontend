@@ -255,7 +255,7 @@ public class AdminChapterFormFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull VH holder, int position) {
             ChapterResponse ch = chapterList.get(position);
-            String label = "Ch." + ch.getChapterNumber();
+            String label = "Ch." + com.ptithcm.manga.util.ChapterFormatter.format(ch.getChapterNumber());
             if (ch.getTitle() != null && !ch.getTitle().isEmpty()) {
                 label += ": " + ch.getTitle();
             }

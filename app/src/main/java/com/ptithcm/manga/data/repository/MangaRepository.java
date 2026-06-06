@@ -98,6 +98,20 @@ public class MangaRepository {
         });
     }
 
+    public void getMangaById(int mangaId, MangaCallback<MangaResponse> callback) {
+        mangaApi.getMangaById(mangaId).enqueue(new Callback<ApiResponse<MangaResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<MangaResponse>> call, Response<ApiResponse<MangaResponse>> response) {
+                handleApiResponse(response, callback, "Không tìm thấy truyện");
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<MangaResponse>> call, Throwable throwable) {
+                callback.onError(networkError(throwable));
+            }
+        });
+    }
+
     public void searchManga(String keyword, int page, int size, MangaCallback<PageResponse<MangaResponse>> callback) {
         mangaApi.searchMangas(keyword, page, size).enqueue(new Callback<PageResponse<MangaResponse>>() {
             @Override

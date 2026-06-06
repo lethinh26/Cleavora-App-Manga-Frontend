@@ -118,6 +118,10 @@
         <argument
             android:name="mangaSlug"
             app:argType="string" />
+        <argument
+            android:name="mangaId"
+            app:argType="integer"
+            android:defaultValue="-1" />
     </fragment>
 
     <!-- User Content Management -->

@@ -30,6 +30,7 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.View
     }
 
     public void addMangas(List<MangaResponse> newMangas) {
+        if (newMangas == null || newMangas.isEmpty()) return;
         int startPos = mangas.size();
         mangas.addAll(newMangas);
         notifyItemRangeInserted(startPos, newMangas.size());
@@ -55,13 +56,20 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.View
         if (manga.getCoverImageUrl() != null && !manga.getCoverImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(manga.getCoverImageUrl())
+                    .placeholder(R.drawable.bg_placeholder_cover)
+                    .error(R.drawable.bg_placeholder_cover)
+                    .centerCrop()
                     .into(holder.ivCover);
         }
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onMangaClick(manga.getId());
-            }
-        });
+        // Guard: getId() có thể null nếu response thiếu field
+        Integer id = manga.getId();
+        if (id != null && id > 0) {
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) listener.onMangaClick(id);
+            });
+        } else {
+            holder.itemView.setOnClickListener(null);
+        }
     }
 
     @Override

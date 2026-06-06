@@ -43,6 +43,9 @@ public interface MangaApi {
     @GET("v1/mangas/{slug}")
     Call<ApiResponse<MangaResponse>> getMangaBySlug(@Path("slug") String slug);
 
+    @GET("v1/mangas/by-id/{id}")
+    Call<ApiResponse<MangaResponse>> getMangaById(@Path("id") int id);
+
     @GET("v1/mangas/search")
     Call<PageResponse<MangaResponse>> searchMangas(
             @Query("keyword") String keyword,
