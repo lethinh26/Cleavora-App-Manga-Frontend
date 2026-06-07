@@ -186,11 +186,14 @@ public class AdminRepository {
         });
     }
 
-    public void updateManga(int mangaId, MangaSubmitRequest request, AdminCallback<MangaResponse> callback) {
-        adminApi.updateManga(mangaId, request).enqueue(new Callback<ApiResponse<MangaResponse>>() {
+    // ============ BAN/UNBAN ============
+
+    public void banManga(int mangaId, String reason, AdminCallback<MangaResponse> callback) {
+        RejectRequest request = new RejectRequest(reason);
+        adminApi.banManga(mangaId, request).enqueue(new Callback<ApiResponse<MangaResponse>>() {
             @Override
             public void onResponse(Call<ApiResponse<MangaResponse>> call, Response<ApiResponse<MangaResponse>> response) {
-                handleApiResponse(response, callback, "Không thể cập nhật truyện");
+                handleApiResponse(response, callback, "Không thể cấm truyện");
             }
 
             @Override
@@ -200,15 +203,15 @@ public class AdminRepository {
         });
     }
 
-    public void deleteManga(int mangaId, AdminCallback<Object> callback) {
-        adminApi.deleteManga(mangaId).enqueue(new Callback<ApiResponse<Object>>() {
+    public void unbanManga(int mangaId, AdminCallback<MangaResponse> callback) {
+        adminApi.unbanManga(mangaId).enqueue(new Callback<ApiResponse<MangaResponse>>() {
             @Override
-            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
-                handleApiResponse(response, callback, "Không thể xóa truyện");
+            public void onResponse(Call<ApiResponse<MangaResponse>> call, Response<ApiResponse<MangaResponse>> response) {
+                handleApiResponse(response, callback, "Không thể bỏ cấm truyện");
             }
 
             @Override
-            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+            public void onFailure(Call<ApiResponse<MangaResponse>> call, Throwable t) {
                 callback.onError(networkError(t));
             }
         });
@@ -259,50 +262,6 @@ public class AdminRepository {
 
             @Override
             public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
-                callback.onError(networkError(t));
-            }
-        });
-    }
-
-    // ============ CHAPTER CRUD ============
-
-    public void createChapter(int mangaId, ChapterRequest request, AdminCallback<ChapterResponse> callback) {
-        adminApi.createChapter(mangaId, request).enqueue(new Callback<ApiResponse<ChapterResponse>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<ChapterResponse>> call, Response<ApiResponse<ChapterResponse>> response) {
-                handleApiResponse(response, callback, "Không thể thêm chapter");
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<ChapterResponse>> call, Throwable t) {
-                callback.onError(networkError(t));
-            }
-        });
-    }
-
-    public void updateChapter(int chapterId, ChapterRequest request, AdminCallback<ChapterResponse> callback) {
-        adminApi.updateChapter(chapterId, request).enqueue(new Callback<ApiResponse<ChapterResponse>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<ChapterResponse>> call, Response<ApiResponse<ChapterResponse>> response) {
-                handleApiResponse(response, callback, "Không thể cập nhật chapter");
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<ChapterResponse>> call, Throwable t) {
-                callback.onError(networkError(t));
-            }
-        });
-    }
-
-    public void deleteChapter(int chapterId, AdminCallback<Object> callback) {
-        adminApi.deleteChapter(chapterId).enqueue(new Callback<ApiResponse<Object>>() {
-            @Override
-            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
-                handleApiResponse(response, callback, "Không thể xóa chapter");
-            }
-
-            @Override
-            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
                 callback.onError(networkError(t));
             }
         });

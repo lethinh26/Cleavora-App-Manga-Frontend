@@ -59,6 +59,12 @@ public class PendingMangaAdapter extends RecyclerView.Adapter<PendingMangaAdapte
         holder.tvTitle.setText(manga.getTitle());
         holder.tvSubmittedAt.setText(manga.getCreatedAt() != null ? manga.getCreatedAt() : "");
 
+        // Bind submitter email
+        if (holder.tvSubmittedBy != null) {
+            String email = manga.getSubmittedByEmail();
+            holder.tvSubmittedBy.setText("Người đăng: " + (email != null ? email : "Đang cập nhật"));
+        }
+
         if (manga.getCoverImageUrl() != null && !manga.getCoverImageUrl().isEmpty()) {
             Glide.with(holder.ivCover.getContext())
                     .load(manga.getCoverImageUrl())
@@ -77,7 +83,7 @@ public class PendingMangaAdapter extends RecyclerView.Adapter<PendingMangaAdapte
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivCover;
-        TextView tvTitle, tvSubmittedAt;
+        TextView tvTitle, tvSubmittedAt, tvSubmittedBy;
         View btnApprove, btnReject;
 
         public ViewHolder(@NonNull View itemView) {
@@ -85,6 +91,7 @@ public class PendingMangaAdapter extends RecyclerView.Adapter<PendingMangaAdapte
             ivCover = itemView.findViewById(R.id.iv_cover);
             tvTitle = itemView.findViewById(R.id.tv_title);
             tvSubmittedAt = itemView.findViewById(R.id.tv_submitted_at);
+            tvSubmittedBy = itemView.findViewById(R.id.tv_submitted_by);
             btnApprove = itemView.findViewById(R.id.btn_approve);
             btnReject = itemView.findViewById(R.id.btn_reject);
         }

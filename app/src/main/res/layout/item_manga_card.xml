@@ -29,7 +29,7 @@
         android:id="@+id/tv_chapter_count"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Chương 10"
+        android:text=""
         android:textColor="@color/subtext"
         android:textSize="11sp" />
 </LinearLayout>

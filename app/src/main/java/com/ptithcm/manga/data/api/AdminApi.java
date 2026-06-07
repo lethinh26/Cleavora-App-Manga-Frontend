@@ -64,7 +64,7 @@ public interface AdminApi {
             @Body RejectRequest request
     );
 
-    // ============ ADMIN MANGA CRUD (#8, #31, #32, #33) ============
+    // ============ ADMIN MANGA MANAGEMENT ============
 
     @GET("v1/admin/mangas")
     Call<ApiResponse<PageResponse<MangaResponse>>> getAdminMangas(
@@ -79,14 +79,16 @@ public interface AdminApi {
     @POST("v1/admin/mangas")
     Call<ApiResponse<MangaResponse>> createManga(@Body MangaSubmitRequest request);
 
-    @PUT("v1/admin/mangas/{id}")
-    Call<ApiResponse<MangaResponse>> updateManga(
+    // ============ BAN/UNBAN ============
+
+    @PUT("v1/admin/mangas/{id}/ban")
+    Call<ApiResponse<MangaResponse>> banManga(
             @Path("id") int mangaId,
-            @Body MangaSubmitRequest request
+            @Body RejectRequest request
     );
 
-    @DELETE("v1/admin/mangas/{id}")
-    Call<ApiResponse<Object>> deleteManga(@Path("id") int mangaId);
+    @PUT("v1/admin/mangas/{id}/unban")
+    Call<ApiResponse<MangaResponse>> unbanManga(@Path("id") int mangaId);
 
     // ============ GENRE CRUD (#40, #41, #42) ============
 
@@ -101,21 +103,4 @@ public interface AdminApi {
 
     @DELETE("v1/admin/genres/{id}")
     Call<ApiResponse<Void>> deleteGenre(@Path("id") int genreId);
-
-    // ============ CHAPTER CRUD (#37, #38, #39) ============
-
-    @POST("v1/admin/mangas/{mangaId}/chapters")
-    Call<ApiResponse<ChapterResponse>> createChapter(
-            @Path("mangaId") int mangaId,
-            @Body ChapterRequest request
-    );
-
-    @PUT("v1/admin/chapters/{id}")
-    Call<ApiResponse<ChapterResponse>> updateChapter(
-            @Path("id") int chapterId,
-            @Body ChapterRequest request
-    );
-
-    @DELETE("v1/admin/chapters/{id}")
-    Call<ApiResponse<Object>> deleteChapter(@Path("id") int chapterId);
 }

@@ -24,8 +24,8 @@ public class AdminMangaAdapter extends RecyclerView.Adapter<AdminMangaAdapter.Vi
 
     public interface AdminMangaListener {
         void onClick(int mangaId);
-        void onDelete(int mangaId);
-        void onManageChapters(int mangaId);
+        void onBan(int mangaId);
+        void onUnban(int mangaId);
     }
 
     public AdminMangaAdapter(AdminMangaListener listener) {
@@ -94,8 +94,17 @@ public class AdminMangaAdapter extends RecyclerView.Adapter<AdminMangaAdapter.Vi
 
         holder.itemView.setOnClickListener(v -> listener.onClick(manga.getId()));
 
-        holder.btnDelete.setOnClickListener(v -> listener.onDelete(manga.getId()));
-        holder.btnChapters.setOnClickListener(v -> listener.onManageChapters(manga.getId()));
+        // Show ban/unban based on current status
+        if (manga.getApprovalStatus() == MangaResponse.ApprovalStatus.BANNED) {
+            holder.btnBan.setVisibility(android.view.View.GONE);
+            holder.btnUnban.setVisibility(android.view.View.VISIBLE);
+        } else {
+            holder.btnBan.setVisibility(android.view.View.VISIBLE);
+            holder.btnUnban.setVisibility(android.view.View.GONE);
+        }
+
+        holder.btnBan.setOnClickListener(v -> listener.onBan(manga.getId()));
+        holder.btnUnban.setOnClickListener(v -> listener.onUnban(manga.getId()));
     }
 
     @Override
@@ -106,7 +115,7 @@ public class AdminMangaAdapter extends RecyclerView.Adapter<AdminMangaAdapter.Vi
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivCover;
         TextView tvTitle, tvAuthor, tvCreatedAt, tvApprovalStatus;
-        View btnDelete, btnChapters;
+        View btnBan, btnUnban;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -115,8 +124,8 @@ public class AdminMangaAdapter extends RecyclerView.Adapter<AdminMangaAdapter.Vi
             tvAuthor = itemView.findViewById(R.id.tv_author);
             tvCreatedAt = itemView.findViewById(R.id.tv_created_at);
             tvApprovalStatus = itemView.findViewById(R.id.tv_approval_status);
-            btnDelete = itemView.findViewById(R.id.btn_delete);
-            btnChapters = itemView.findViewById(R.id.btn_chapters);
+            btnBan = itemView.findViewById(R.id.btn_ban);
+            btnUnban = itemView.findViewById(R.id.btn_unban);
         }
     }
 }

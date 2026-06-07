@@ -46,7 +46,7 @@ public class MangaDetailFragment extends Fragment {
     private MangaRepository mangaRepository;
     private TokenManager tokenManager;
 
-    private ImageView ivCover, btnBack;
+    private ImageView ivCover;
     private TextView tvTitle, tvAuthor, tvStatus, tvViews, tvLikes, tvFollows, tvDescription;
     private RecyclerView rvGenres, rvChapters;
     private MaterialButton btnLike, btnFollow, btnStartReading, btnContinueReading;
@@ -99,7 +99,6 @@ public class MangaDetailFragment extends Fragment {
 
     private void initViews(View view) {
         ivCover = view.findViewById(R.id.iv_cover);
-        btnBack = view.findViewById(R.id.btn_back);
 
         tvTitle = view.findViewById(R.id.tv_title);
         tvAuthor = view.findViewById(R.id.tv_author);
@@ -134,8 +133,6 @@ public class MangaDetailFragment extends Fragment {
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> Navigation.findNavController(v).navigateUp());
-
         btnLike.setOnClickListener(v -> {
             if (!ensureLoggedIn() || !ensureMangaId()) return;
             toggleLike();
@@ -272,7 +269,7 @@ public class MangaDetailFragment extends Fragment {
         }
 
         if (manga.getTotalChapters() != null && manga.getTotalChapters() > 0) {
-            btnStartReading.setText("Đọc ngay (Chương 1)");
+            btnStartReading.setText("Đọc ngay");
             btnStartReading.setEnabled(true);
         } else {
             btnStartReading.setText("Chưa có chương nào");
@@ -289,7 +286,7 @@ public class MangaDetailFragment extends Fragment {
                 if (result != null && !result.isEmpty()) {
                     chapterAdapter.setChapters(result);
                     // Update button state based on actual loaded chapters (not manga.totalChapters)
-                    btnStartReading.setText("Đọc ngay (Chương 1)");
+                    btnStartReading.setText("Đọc ngay");
                     btnStartReading.setEnabled(true);
                 } else {
                     btnStartReading.setText("Chưa có chương nào");
@@ -444,7 +441,7 @@ public class MangaDetailFragment extends Fragment {
             public void onSuccess(ReadingHistoryResponse data) {
                 if (!isAdded() || data == null) return;
                 btnContinueReading.setVisibility(View.VISIBLE);
-                btnContinueReading.setText("Tiếp tục đọc - Chương " + data.getChapterId());
+                btnContinueReading.setText("Tiếp tục đọc - Chương " + com.ptithcm.manga.util.ChapterFormatter.format(data.getChapterNumber()));
                 btnContinueReading.setOnClickListener(v -> {
                     Intent intent = new Intent(requireContext(), ReaderActivity.class);
                     intent.putExtra("MANGA_ID", data.getMangaId());

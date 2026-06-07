@@ -78,6 +78,67 @@ public class ChapterRepository {
         });
     }
 
+    // ============ OWNER CHAPTER MANAGEMENT ============
+
+    public void createChapter(int mangaId, com.ptithcm.manga.data.model.request.ChapterRequest request,
+                              final RepositoryCallback<ChapterResponse> callback) {
+        chapterApi.createChapter(mangaId, request).enqueue(new Callback<ApiResponse<ChapterResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ChapterResponse>> call, Response<ApiResponse<ChapterResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    callback.onSuccess(response.body().getData());
+                } else {
+                    String errorMsg = response.body() != null ? response.body().getMessage() : "Không thể thêm chapter";
+                    callback.onError(errorMsg);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ChapterResponse>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    public void updateChapter(int chapterId, com.ptithcm.manga.data.model.request.ChapterRequest request,
+                              final RepositoryCallback<ChapterResponse> callback) {
+        chapterApi.updateChapter(chapterId, request).enqueue(new Callback<ApiResponse<ChapterResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<ChapterResponse>> call, Response<ApiResponse<ChapterResponse>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    callback.onSuccess(response.body().getData());
+                } else {
+                    String errorMsg = response.body() != null ? response.body().getMessage() : "Không thể cập nhật chapter";
+                    callback.onError(errorMsg);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<ChapterResponse>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
+    public void deleteChapter(int chapterId, final RepositoryCallback<Object> callback) {
+        chapterApi.deleteChapter(chapterId).enqueue(new Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    callback.onSuccess(response.body().getData());
+                } else {
+                    String errorMsg = response.body() != null ? response.body().getMessage() : "Không thể xóa chapter";
+                    callback.onError(errorMsg);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Object>> call, Throwable t) {
+                callback.onError(t.getMessage());
+            }
+        });
+    }
+
     public interface RepositoryCallback<T> {
         void onSuccess(T result);
         void onError(String message);

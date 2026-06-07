@@ -125,7 +125,7 @@ public class EditProfileFragment extends Fragment {
                 @Override
                 public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
-                        String newAvatarUrl = response.body().secure_url;
+                        String newAvatarUrl = response.body().imageUrl;
                         performUpdateProfile(view, name, email, newAvatarUrl);
                     } else {
                         Toast.makeText(getContext(), "Tải ảnh thất bại!", Toast.LENGTH_SHORT).show();

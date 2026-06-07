@@ -22,18 +22,6 @@
                 android:background="@color/surface_variant"
                 android:contentDescription="cover"
                 android:scaleType="centerCrop" />
-
-            <!-- Back Button -->
-            <ImageView
-                android:id="@+id/btn_back"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="start|top"
-                android:layout_margin="@dimen/spacing_lg"
-                android:background="@drawable/bg_rounded_surface"
-                android:contentDescription="back"
-                android:padding="@dimen/spacing_sm"
-                android:src="@android:drawable/ic_menu_revert" />
         </FrameLayout>
 
         <LinearLayout

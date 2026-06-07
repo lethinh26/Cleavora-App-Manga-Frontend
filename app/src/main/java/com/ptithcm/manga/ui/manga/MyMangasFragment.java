@@ -1,9 +1,11 @@
 package com.ptithcm.manga.ui.manga;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupMenu;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,6 +35,7 @@ public class MyMangasFragment extends Fragment implements MangaCardAdapter.OnMan
     private MaterialButton btnSubmitNew;
 
     private String currentStatus = null; // null tương ứng với "Tất cả"
+    private List<MangaResponse> currentList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -99,9 +102,11 @@ public class MyMangasFragment extends Fragment implements MangaCardAdapter.OnMan
                 if (!isAdded()) return;
                 requireActivity().runOnUiThread(() -> {
                     if (data != null && data.getContent() != null) {
-                        adapter.updateData(data.getContent());
+                        currentList = data.getContent();
+                        adapter.updateData(currentList);
                     } else {
-                        adapter.updateData(new ArrayList<>());
+                        currentList = new ArrayList<>();
+                        adapter.updateData(currentList);
                     }
                 });
             }
@@ -118,9 +123,62 @@ public class MyMangasFragment extends Fragment implements MangaCardAdapter.OnMan
 
     @Override
     public void onMangaClick(MangaResponse manga) {
-        // Xem chi tiết truyện của tôi
-        Bundle bundle = new Bundle();
-        bundle.putString("mangaSlug", manga.getSlug());
-        Navigation.findNavController(requireView()).navigate(R.id.action_my_mangas_to_manga_detail, bundle);
+        // Show popup menu with owner actions
+        PopupMenu popup = new PopupMenu(requireContext(), rvMyMangas);
+        popup.getMenu().add(0, 1, 0, "Xem chi tiết");
+
+        // Only show "Quản lý chương" for APPROVED mangas
+        if (manga.getApprovalStatus() == MangaResponse.ApprovalStatus.APPROVED) {
+            popup.getMenu().add(0, 2, 1, "Quản lý chương");
+        }
+
+        popup.getMenu().add(0, 3, 2, "Xoá truyện");
+
+        popup.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case 1: // View detail
+                    Bundle bundle = new Bundle();
+                    bundle.putString("mangaSlug", manga.getSlug());
+                    Navigation.findNavController(requireView()).navigate(R.id.action_my_mangas_to_manga_detail, bundle);
+                    return true;
+                case 2: // Manage chapters
+                    Bundle args = new Bundle();
+                    args.putInt("mangaId", manga.getId());
+                    Navigation.findNavController(requireView()).navigate(R.id.action_my_mangas_to_chapter_form, args);
+                    return true;
+                case 3: // Delete manga
+                    confirmDeleteManga(manga.getId());
+                    return true;
+            }
+            return false;
+        });
+        popup.show();
+    }
+
+    private void confirmDeleteManga(int mangaId) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Xoá truyện")
+                .setMessage("Bạn có chắc muốn xoá truyện này? Toàn bộ chapters sẽ bị xoá.")
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    mangaRepository.deleteMyManga(mangaId, new MangaRepository.MangaCallback<Object>() {
+                        @Override
+                        public void onSuccess(Object data) {
+                            if (!isAdded()) return;
+                            requireActivity().runOnUiThread(() -> {
+                                Toast.makeText(requireContext(), "Đã xoá truyện", Toast.LENGTH_SHORT).show();
+                                loadMyMangas();
+                            });
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            if (!isAdded()) return;
+                            requireActivity().runOnUiThread(() ->
+                                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show());
+                        }
+                    });
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 }

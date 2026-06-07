@@ -16,8 +16,10 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
 
@@ -74,6 +76,15 @@ public interface MangaApi {
             @Query("page") int page,
             @Query("size") int size
     );
+
+    @PUT("v1/me/mangas/{id}")
+    Call<ApiResponse<MangaResponse>> updateMyManga(
+            @Path("id") int mangaId,
+            @Body MangaSubmitRequest request
+    );
+
+    @DELETE("v1/me/mangas/{id}")
+    Call<ApiResponse<Object>> deleteMyManga(@Path("id") int mangaId);
 
     @POST("v1/mangas/{id}/follow")
     Call<ApiResponse<FollowResponse>> toggleFollow(@Path("id") int mangaId);

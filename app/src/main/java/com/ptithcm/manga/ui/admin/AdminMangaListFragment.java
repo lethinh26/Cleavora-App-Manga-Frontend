@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -169,24 +170,35 @@ public class AdminMangaListFragment extends Fragment implements AdminMangaAdapte
 
     @Override
     public void onClick(int mangaId) {
+        // View manga details (read-only for admin)
         Bundle args = new Bundle();
         args.putInt("mangaId", mangaId);
         Navigation.findNavController(requireView()).navigate(R.id.action_admin_manga_to_form, args);
     }
 
     @Override
-    public void onDelete(int mangaId) {
+    public void onBan(int mangaId) {
+        EditText input = new EditText(requireContext());
+        input.setHint("Lý do cấm truyện");
+        input.setPadding(32, 16, 32, 16);
+
         new AlertDialog.Builder(requireContext())
-                .setTitle("Xóa truyện")
-                .setMessage("Xóa truyện này? Tất cả chapters, likes, follows, history sẽ bị xóa.")
-                .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    adminRepository.deleteManga(mangaId, new AdminRepository.AdminCallback<Object>() {
+                .setTitle("Cấm truyện")
+                .setMessage("Truyện sẽ bị ẩn khỏi danh sách công khai.")
+                .setView(input)
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    String reason = input.getText().toString().trim();
+                    if (reason.isEmpty()) {
+                        Toast.makeText(requireContext(), "Vui lòng nhập lý do", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    adminRepository.banManga(mangaId, reason, new AdminRepository.AdminCallback<MangaResponse>() {
                         @Override
-                        public void onSuccess(Object data) {
+                        public void onSuccess(MangaResponse data) {
                             if (!isAdded()) return;
                             requireActivity().runOnUiThread(() -> {
-                                adapter.removeItem(mangaId);
-                                Toast.makeText(requireContext(), "Đã xóa truyện", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(requireContext(), "Đã cấm truyện", Toast.LENGTH_SHORT).show();
+                                loadMangas();
                             });
                         }
 
@@ -203,9 +215,30 @@ public class AdminMangaListFragment extends Fragment implements AdminMangaAdapte
     }
 
     @Override
-    public void onManageChapters(int mangaId) {
-        Bundle args = new Bundle();
-        args.putInt("mangaId", mangaId);
-        Navigation.findNavController(requireView()).navigate(R.id.action_admin_manga_to_chapter_form, args);
+    public void onUnban(int mangaId) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Bỏ cấm truyện")
+                .setMessage("Truyện sẽ hiển thị lại công khai.")
+                .setPositiveButton(R.string.confirm, (dialog, which) -> {
+                    adminRepository.unbanManga(mangaId, new AdminRepository.AdminCallback<MangaResponse>() {
+                        @Override
+                        public void onSuccess(MangaResponse data) {
+                            if (!isAdded()) return;
+                            requireActivity().runOnUiThread(() -> {
+                                Toast.makeText(requireContext(), "Đã bỏ cấm truyện", Toast.LENGTH_SHORT).show();
+                                loadMangas();
+                            });
+                        }
+
+                        @Override
+                        public void onError(String message) {
+                            if (!isAdded()) return;
+                            requireActivity().runOnUiThread(() ->
+                                    Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show());
+                        }
+                    });
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 }

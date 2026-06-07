@@ -24,7 +24,6 @@ import com.ptithcm.manga.R;
 import com.ptithcm.manga.data.model.request.ChapterRequest;
 import com.ptithcm.manga.data.model.response.ChapterResponse;
 import com.ptithcm.manga.data.model.response.UploadResponse;
-import com.ptithcm.manga.data.repository.AdminRepository;
 import com.ptithcm.manga.data.repository.ChapterRepository;
 import com.ptithcm.manga.data.repository.UploadRepository;
 
@@ -37,7 +36,6 @@ import retrofit2.Response;
 
 public class AdminChapterFormFragment extends Fragment {
 
-    private AdminRepository adminRepository;
     private ChapterRepository chapterRepository;
     private UploadRepository uploadRepository;
 
@@ -45,7 +43,6 @@ public class AdminChapterFormFragment extends Fragment {
     private ChapterListAdapter adapter;
     private int mangaId = -1;
     private final List<ChapterResponse> chapterList = new ArrayList<>();
-    private final List<String> pendingImageUrls = new ArrayList<>(); // for new chapter upload
 
     @Nullable
     @Override
@@ -58,7 +55,6 @@ public class AdminChapterFormFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        adminRepository = new AdminRepository(requireContext());
         chapterRepository = new ChapterRepository(requireContext());
         uploadRepository = new UploadRepository(requireContext());
 
@@ -121,6 +117,11 @@ public class AdminChapterFormFragment extends Fragment {
                 LinearLayoutManager.HORIZONTAL, false));
         rvImages.setAdapter(imageAdapter);
 
+        // Connect to class-level references so upload callback can update this dialog
+        activeImageUrls = imageUrls;
+        activeImageAdapter = imageAdapter;
+        uploadingCount = 0;
+
         btnAddImage.setOnClickListener(v -> {
             Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
             intent.setType("image/*");
@@ -154,7 +155,7 @@ public class AdminChapterFormFragment extends Fragment {
                     chapterNumber,
                     refImageUrls.isEmpty() ? null : new ArrayList<>(refImageUrls));
 
-            adminRepository.createChapter(mangaId, request, new AdminRepository.AdminCallback<ChapterResponse>() {
+            chapterRepository.createChapter(mangaId, request, new ChapterRepository.RepositoryCallback<ChapterResponse>() {
                 @Override
                 public void onSuccess(ChapterResponse data) {
                     if (!isAdded()) return;
@@ -182,7 +183,7 @@ public class AdminChapterFormFragment extends Fragment {
                 .setTitle("Xóa chapter")
                 .setMessage("Xóa chapter này? Tất cả ảnh trang sẽ bị xóa.")
                 .setPositiveButton(R.string.delete, (dialog, which) -> {
-                    adminRepository.deleteChapter(chapterId, new AdminRepository.AdminCallback<Object>() {
+                    chapterRepository.deleteChapter(chapterId, new ChapterRepository.RepositoryCallback<Object>() {
                         @Override
                         public void onSuccess(Object data) {
                             if (!isAdded()) return;
@@ -204,31 +205,59 @@ public class AdminChapterFormFragment extends Fragment {
                 .show();
     }
 
+    // References to current dialog's image list and adapter (for picker callback)
+    private List<String> activeImageUrls;
+    private ImageListAdapter activeImageAdapter;
+    private int uploadingCount = 0;
+
     private final ActivityResultLauncher<Intent> imagePickLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
-                    // Single image pick for simplicity
-                    Uri uri = result.getData().getData();
-                    if (uri != null) {
-                        uploadImageForChapter(uri);
+                    // Handle multiple image selection
+                    android.content.ClipData clipData = result.getData().getClipData();
+                    if (clipData != null) {
+                        for (int i = 0; i < clipData.getItemCount(); i++) {
+                            Uri uri = clipData.getItemAt(i).getUri();
+                            if (uri != null) uploadImageForChapter(uri);
+                        }
+                    } else {
+                        // Single image
+                        Uri uri = result.getData().getData();
+                        if (uri != null) uploadImageForChapter(uri);
                     }
                 }
             });
 
     private void uploadImageForChapter(Uri uri) {
-        Toast.makeText(requireContext(), "Đang upload ảnh...", Toast.LENGTH_SHORT).show();
+        uploadingCount++;
+        Toast.makeText(requireContext(), "Đang upload ảnh... (" + uploadingCount + " đang xử lý)", Toast.LENGTH_SHORT).show();
+
         uploadRepository.uploadImage(uri, "chapter_pages").enqueue(new Callback<com.ptithcm.manga.data.model.response.ApiResponse<UploadResponse>>() {
             @Override
             public void onResponse(@NonNull Call<com.ptithcm.manga.data.model.response.ApiResponse<UploadResponse>> call,
                                    @NonNull Response<com.ptithcm.manga.data.model.response.ApiResponse<UploadResponse>> response) {
                 if (!isAdded()) return;
+                uploadingCount--;
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    String url = response.body().getData().secure_url;
+                    String url = response.body().getData().imageUrl;
                     requireActivity().runOnUiThread(() -> {
-                        pendingImageUrls.add(url);
-                        Toast.makeText(requireContext(), "Upload ảnh thành công", Toast.LENGTH_SHORT).show();
+                        if (url != null && !url.isEmpty() && activeImageUrls != null) {
+                            activeImageUrls.add(url);
+                            if (activeImageAdapter != null) {
+                                activeImageAdapter.notifyItemInserted(activeImageUrls.size() - 1);
+                            }
+                            Toast.makeText(requireContext(),
+                                    "Upload thành công (" + activeImageUrls.size() + " ảnh)" +
+                                            (uploadingCount > 0 ? " - còn " + uploadingCount + " đang xử lý" : " - hoàn tất!"),
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(requireContext(), "Upload ảnh thất bại (URL trống)", Toast.LENGTH_SHORT).show();
+                        }
                     });
+                } else {
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(requireContext(), "Upload ảnh thất bại", Toast.LENGTH_SHORT).show());
                 }
             }
 
@@ -236,8 +265,9 @@ public class AdminChapterFormFragment extends Fragment {
             public void onFailure(@NonNull Call<com.ptithcm.manga.data.model.response.ApiResponse<UploadResponse>> call,
                                   @NonNull Throwable t) {
                 if (!isAdded()) return;
+                uploadingCount--;
                 requireActivity().runOnUiThread(() ->
-                        Toast.makeText(requireContext(), "Upload thất bại: " + t.getMessage(), Toast.LENGTH_SHORT).show());
+                        Toast.makeText(requireContext(), "Lỗi upload: " + t.getMessage(), Toast.LENGTH_SHORT).show());
             }
         });
     }
@@ -261,9 +291,14 @@ public class AdminChapterFormFragment extends Fragment {
             }
             holder.tvNumber.setText(label);
             holder.tvTitle.setText(ch.getViewCount() + " trang");
-            holder.itemView.setOnLongClickListener(v -> {
-                deleteChapter(ch.getId());
-                return true;
+            holder.itemView.setOnClickListener(v -> {
+                android.widget.PopupMenu popup = new android.widget.PopupMenu(v.getContext(), v);
+                popup.getMenu().add("Xoá chapter");
+                popup.setOnMenuItemClickListener(item -> {
+                    deleteChapter(ch.getId());
+                    return true;
+                });
+                popup.show();
             });
         }
 
@@ -307,9 +342,9 @@ public class AdminChapterFormFragment extends Fragment {
         @Override
         public void onBindViewHolder(@NonNull IH holder, int position) {
             Glide.with(holder.iv.getContext()).load(urls.get(position)).into(holder.iv);
-            holder.iv.setOnLongClickListener(v -> {
+            // Tap to remove image
+            holder.iv.setOnClickListener(v -> {
                 listener.onRemove(urls.get(position));
-                return true;
             });
         }
 

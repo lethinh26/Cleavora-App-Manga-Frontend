@@ -226,7 +226,7 @@ public class AdminMangaFormFragment extends Fragment {
                                    @NonNull Response<com.ptithcm.manga.data.model.response.ApiResponse<UploadResponse>> response) {
                 if (!isAdded()) return;
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    coverUrl = response.body().getData().secure_url;
+                    coverUrl = response.body().getData().imageUrl;
                     requireActivity().runOnUiThread(() -> {
                         Glide.with(requireContext()).load(coverUrl)
                                 .placeholder(R.drawable.bg_placeholder_cover).into(ivCover);
@@ -280,7 +280,7 @@ public class AdminMangaFormFragment extends Fragment {
         btnSave.setEnabled(false);
 
         if (mangaId > 0) {
-            adminRepository.updateManga(mangaId, request, new AdminRepository.AdminCallback<MangaResponse>() {
+            mangaRepository.updateMyManga(mangaId, request, new MangaRepository.MangaCallback<MangaResponse>() {
                 @Override
                 public void onSuccess(MangaResponse data) {
                     onSaveSuccess();

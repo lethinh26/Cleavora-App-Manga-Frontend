@@ -242,6 +242,34 @@ public class MangaRepository {
         });
     }
 
+    public void deleteMyManga(int mangaId, MangaCallback<Object> callback) {
+        mangaApi.deleteMyManga(mangaId).enqueue(new Callback<ApiResponse<Object>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Object>> call, Response<ApiResponse<Object>> response) {
+                handleApiResponse(response, callback, "Không thể xoá truyện");
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Object>> call, Throwable throwable) {
+                callback.onError(networkError(throwable));
+            }
+        });
+    }
+
+    public void updateMyManga(int mangaId, MangaSubmitRequest request, MangaCallback<MangaResponse> callback) {
+        mangaApi.updateMyManga(mangaId, request).enqueue(new Callback<ApiResponse<MangaResponse>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<MangaResponse>> call, Response<ApiResponse<MangaResponse>> response) {
+                handleApiResponse(response, callback, "Không thể cập nhật truyện");
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<MangaResponse>> call, Throwable throwable) {
+                callback.onError(networkError(throwable));
+            }
+        });
+    }
+
     private <T> void handleApiResponse(Response<ApiResponse<T>> response, MangaCallback<T> callback, String defaultMessage) {
         if (response.isSuccessful() && response.body() != null) {
             ApiResponse<T> body = response.body();

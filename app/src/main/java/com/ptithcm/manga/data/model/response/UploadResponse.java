@@ -1,6 +1,11 @@
 package com.ptithcm.manga.data.model.response;
 
+import com.google.gson.annotations.SerializedName;
+
 public class UploadResponse {
-    public String public_id;
-    public String secure_url;
+    @SerializedName(value = "imageUrl", alternate = {"secure_url"})
+    public String imageUrl;
+
+    @SerializedName(value = "publicId", alternate = {"public_id"})
+    public String publicId;
 }

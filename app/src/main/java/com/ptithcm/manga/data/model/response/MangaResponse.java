@@ -55,12 +55,16 @@ public class MangaResponse {
 
     private Integer totalChapters;
 
+    private String submittedByEmail;
+
+    private String submittedByName;
+
     public enum MangaStatus{
         ONGOING, COMPLETED, HIATUS
     }
 
     public enum ApprovalStatus{
-        PENDING, APPROVED, REJECTED
+        PENDING, APPROVED, REJECTED, BANNED
     }
 
     public MangaResponse() {
@@ -192,5 +196,21 @@ public class MangaResponse {
 
     public Integer getTotalChapters() {
         return totalChapters;
+    }
+
+    public String getSubmittedByEmail() {
+        return submittedByEmail;
+    }
+
+    public void setSubmittedByEmail(String submittedByEmail) {
+        this.submittedByEmail = submittedByEmail;
+    }
+
+    public String getSubmittedByName() {
+        return submittedByName;
+    }
+
+    public void setSubmittedByName(String submittedByName) {
+        this.submittedByName = submittedByName;
     }
 }

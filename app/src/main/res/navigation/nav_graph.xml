@@ -136,6 +136,9 @@
         <action
             android:id="@+id/action_my_mangas_to_manga_detail"
             app:destination="@id/nav_manga_detail" />
+        <action
+            android:id="@+id/action_my_mangas_to_chapter_form"
+            app:destination="@id/nav_admin_chapter_form" />
     </fragment>
 
     <fragment

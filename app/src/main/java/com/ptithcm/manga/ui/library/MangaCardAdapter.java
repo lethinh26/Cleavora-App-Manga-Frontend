@@ -53,6 +53,17 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         MangaResponse manga = mangas.get(position);
         holder.tvTitle.setText(manga.getTitle());
+
+        // Bind chapter count
+        if (holder.tvChapterCount != null) {
+            Integer total = manga.getTotalChapters();
+            if (total != null && total > 0) {
+                holder.tvChapterCount.setText("Chương " + total);
+            } else {
+                holder.tvChapterCount.setText("Chưa có chương");
+            }
+        }
+
         if (manga.getCoverImageUrl() != null && !manga.getCoverImageUrl().isEmpty()) {
             Glide.with(holder.itemView.getContext())
                     .load(manga.getCoverImageUrl())
@@ -80,11 +91,13 @@ public class MangaCardAdapter extends RecyclerView.Adapter<MangaCardAdapter.View
     static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivCover;
         TextView tvTitle;
+        TextView tvChapterCount;
 
         ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivCover = itemView.findViewById(R.id.iv_cover);
             tvTitle = itemView.findViewById(R.id.tv_title);
+            tvChapterCount = itemView.findViewById(R.id.tv_chapter_count);
         }
     }
 }
