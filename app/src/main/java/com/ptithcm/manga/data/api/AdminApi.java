@@ -104,18 +104,18 @@ public interface AdminApi {
 
     // ============ CHAPTER CRUD (#37, #38, #39) ============
 
-    @POST("v1/admin/mangas/{mangaId}/chapters")
+    @POST("v1/mangas/{mangaId}/chapters")
     Call<ApiResponse<ChapterResponse>> createChapter(
             @Path("mangaId") int mangaId,
             @Body ChapterRequest request
     );
 
-    @PUT("v1/admin/chapters/{id}")
+    @PUT("v1/chapters/{id}")
     Call<ApiResponse<ChapterResponse>> updateChapter(
             @Path("id") int chapterId,
             @Body ChapterRequest request
     );
 
-    @DELETE("v1/admin/chapters/{id}")
+    @DELETE("v1/chapters/{id}")
     Call<ApiResponse<Object>> deleteChapter(@Path("id") int chapterId);
 }

@@ -14,7 +14,7 @@ public class MangaResponse {
 
     private String coverImageUrl;
 
-    public MangaResponse(Integer id, String title, String slug, String description, String coverImageUrl, String authorName, String artistName, MangaStatus status, ApprovalStatus approvalStatus, Integer viewCount, Integer likeCount, Integer followCount, String createdAt, String updatedAt, Set<String> genres, Integer totalChapters) {
+    public MangaResponse(Integer id, String title, String slug, String description, String coverImageUrl, String authorName, String artistName, MangaStatus status, ApprovalStatus approvalStatus, Integer viewCount, Integer likeCount, Integer followCount, String createdAt, String updatedAt, Set<String> genres, Integer totalChapters, Integer submittedById) {
         this.id = id;
         this.title = title;
         this.slug = slug;
@@ -31,6 +31,7 @@ public class MangaResponse {
         this.updatedAt = updatedAt;
         this.genres = genres;
         this.totalChapters = totalChapters;
+        this.submittedById = submittedById;
     }
 
     private String authorName;
@@ -54,6 +55,8 @@ public class MangaResponse {
     private Set<String> genres;
 
     private Integer totalChapters;
+
+    private Integer submittedById;
 
     public enum MangaStatus{
         ONGOING, COMPLETED, HIATUS
@@ -192,5 +195,13 @@ public class MangaResponse {
 
     public Integer getTotalChapters() {
         return totalChapters;
+    }
+
+    public Integer getSubmittedById() {
+        return submittedById;
+    }
+
+    public void setSubmittedById(Integer submittedById) {
+        this.submittedById = submittedById;
     }
 }

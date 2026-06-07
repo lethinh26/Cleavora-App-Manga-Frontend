@@ -147,7 +147,7 @@ public class SubmitMangaFragment extends Fragment {
             @Override
             public void onResponse(Call<UploadResponse> call, Response<UploadResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    String coverUrl = response.body().secure_url;
+                    String coverUrl = response.body().imageUrl;
                     // 2. Submit manga details with the uploaded URL
                     performSubmit(title, author, description, coverUrl);
                 } else {

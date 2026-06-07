@@ -97,6 +97,17 @@ public class MangaDetailFragment extends Fragment {
         loadMangaDetail();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Reload data khi quay lại (sau khi đọc chapter) để cập nhật view count và tiếp tục đọc
+        if (mangaId > 0 || (mangaSlug != null && !mangaSlug.trim().isEmpty())) {
+            // Reset để cho phép reload reading progress mỗi lần quay lại
+            checkReadingProgress();
+            loadMangaDetail();
+        }
+    }
+
     private void initViews(View view) {
         ivCover = view.findViewById(R.id.iv_cover);
         btnBack = view.findViewById(R.id.btn_back);
@@ -116,6 +127,11 @@ public class MangaDetailFragment extends Fragment {
         btnFollow = view.findViewById(R.id.btn_follow);
         btnStartReading = view.findViewById(R.id.btn_start_reading);
         btnContinueReading = view.findViewById(R.id.btn_continue_reading);
+        MaterialButton btnManageChapters = view.findViewById(R.id.btn_manage_chapters);
+        
+        // Hide by default
+        btnManageChapters.setVisibility(View.GONE);
+        view.setTag(R.id.btn_manage_chapters, btnManageChapters);
 
         genreAdapter = new GenreChipAdapter();
         rvGenres.setLayoutManager(
@@ -150,8 +166,15 @@ public class MangaDetailFragment extends Fragment {
         btnStartReading.setOnClickListener(v -> {
             List<ChapterResponse> chapters = chapterAdapter.getChapters();
             if (chapters != null && !chapters.isEmpty()) {
+                // Luôn đọc chapter có chapterNumber nhỏ nhất (chapter 1)
+                ChapterResponse firstChapter = chapters.get(0);
+                for (ChapterResponse ch : chapters) {
+                    if (ch.getChapterNumber() < firstChapter.getChapterNumber()) {
+                        firstChapter = ch;
+                    }
+                }
                 Intent intent = new Intent(requireContext(), ReaderActivity.class);
-                intent.putExtra("CHAPTER_ID", chapters.get(0).getId());
+                intent.putExtra("CHAPTER_ID", firstChapter.getId());
                 intent.putExtra("MANGA_ID", mangaId);
                 startActivity(intent);
             } else {
@@ -277,6 +300,26 @@ public class MangaDetailFragment extends Fragment {
         } else {
             btnStartReading.setText("Chưa có chương nào");
             btnStartReading.setEnabled(false);
+        }
+
+        // Logic check quyền để hiện nút Quản lý
+        if (getView() != null && getView().getTag(R.id.btn_manage_chapters) != null) {
+            MaterialButton btnManageChapters = (MaterialButton) getView().getTag(R.id.btn_manage_chapters);
+            boolean isOwner = manga.getSubmittedById() != null &&
+                    manga.getSubmittedById().equals(tokenManager.getUserId());
+            boolean isAdmin = "ADMIN".equals(tokenManager.getRole()) || "SUPERADMIN".equals(tokenManager.getRole());
+
+            if (isOwner || isAdmin) {
+                btnManageChapters.setVisibility(View.VISIBLE);
+                btnManageChapters.setOnClickListener(v -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt("mangaId", manga.getId());
+                    // Reuse the admin chapter form but it just adds chapter
+                    Navigation.findNavController(requireView()).navigate(R.id.action_manga_detail_to_admin_chapter_form, bundle);
+                });
+            } else {
+                btnManageChapters.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -444,7 +487,7 @@ public class MangaDetailFragment extends Fragment {
             public void onSuccess(ReadingHistoryResponse data) {
                 if (!isAdded() || data == null) return;
                 btnContinueReading.setVisibility(View.VISIBLE);
-                btnContinueReading.setText("Tiếp tục đọc - Chương " + data.getChapterId());
+                btnContinueReading.setText("Tiếp tục đọc - Chương " + com.ptithcm.manga.util.ChapterFormatter.format(data.getChapterNumber()));
                 btnContinueReading.setOnClickListener(v -> {
                     Intent intent = new Intent(requireContext(), ReaderActivity.class);
                     intent.putExtra("MANGA_ID", data.getMangaId());

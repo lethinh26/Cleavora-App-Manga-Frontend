@@ -122,6 +122,9 @@
             android:name="mangaId"
             app:argType="integer"
             android:defaultValue="-1" />
+        <action
+            android:id="@+id/action_manga_detail_to_admin_chapter_form"
+            app:destination="@id/nav_admin_chapter_form" />
     </fragment>
 
     <!-- User Content Management -->

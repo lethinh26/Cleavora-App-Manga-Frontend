@@ -102,10 +102,15 @@ public class UserListAdapter extends RecyclerView.Adapter<UserListAdapter.ViewHo
 
         // Active switch - gỡ listener trước để tránh trigger khi bind
         if (holder.switchActive != null) {
-            holder.switchActive.setOnCheckedChangeListener(null);
-            holder.switchActive.setChecked(isActive);
-            holder.switchActive.setOnCheckedChangeListener((buttonView, checked) ->
-                    listener.onToggleActive(user.getId()));
+            if ("SUPERADMIN".equals(user.getRole())) {
+                holder.switchActive.setVisibility(View.GONE);
+            } else {
+                holder.switchActive.setVisibility(View.VISIBLE);
+                holder.switchActive.setOnCheckedChangeListener(null);
+                holder.switchActive.setChecked(isActive);
+                holder.switchActive.setOnCheckedChangeListener((buttonView, checked) ->
+                        listener.onToggleActive(user.getId()));
+            }
         }
 
         // Change role button (SUPERADMIN only, không hiện với chính SUPERADMIN)
