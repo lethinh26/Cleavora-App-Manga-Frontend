@@ -25,7 +25,6 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryV
     private List<ReadingHistoryResponse> historyList;
     private final OnHistoryActionListener listener;
 
-    // B8: Multiple date format patterns for robustness
     private static final SimpleDateFormat[] DATE_FORMATS = {
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()),
             new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault()),

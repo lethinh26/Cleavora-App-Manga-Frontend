@@ -23,8 +23,6 @@ public interface UserApi {
     @PUT("v1/me/profile")
     Call<ApiResponse<UserResponse>> updateProfile(@Body ProfileRequest request);
 
-    // --- Reading History ---
-
     @PUT("v1/me/history")
     Call<ApiResponse<ReadingHistoryResponse>> saveReadingProgress(@Body ReadingHistoryRequest request);
 

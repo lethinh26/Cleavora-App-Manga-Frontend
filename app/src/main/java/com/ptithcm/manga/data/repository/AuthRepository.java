@@ -2,6 +2,7 @@ package com.ptithcm.manga.data.repository;
 
 import android.content.Context;
 
+import com.google.gson.Gson;
 import com.ptithcm.manga.data.api.ApiClient;
 import com.ptithcm.manga.data.api.AuthApi;
 import com.ptithcm.manga.data.local.TokenManager;
@@ -81,7 +82,20 @@ public class AuthRepository {
                         callback.onError(body.getMessage());
                     }
                 } else {
-                    callback.onError("Email hoặc mật khẩu không đúng");
+                    // Try to parse error body for actual message
+                    String errorMsg = "Email hoặc mật khẩu không đúng";
+                    try {
+                        if (response.errorBody() != null) {
+                            String raw = response.errorBody().string();
+                            // ErrorResponse format: {"timestamp":"...","status":403,"error":"...","message":"...","path":"..."}
+                            Gson gson = new Gson();
+                            ErrorResponse err = gson.fromJson(raw, ErrorResponse.class);
+                            if (err != null && err.message != null && !err.message.isEmpty()) {
+                                errorMsg = err.message;
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    callback.onError(errorMsg);
                 }
             }
 
@@ -94,5 +108,10 @@ public class AuthRepository {
 
     public void logout() {
         tokenManager.clear();
+    }
+
+    /** Simple POJO for parsing ErrorResponse JSON from backend */
+    private static class ErrorResponse {
+        String message;
     }
 }

@@ -125,7 +125,7 @@ public class SearchFragment extends Fragment implements MangaCardAdapter.OnManga
     }
 
     @Override
-    public void onMangaClick(MangaResponse manga) {
+    public void onMangaClick(MangaResponse manga, View itemView) {
         Bundle bundle = new Bundle();
         bundle.putString("mangaSlug", manga.getSlug());
         Navigation.findNavController(requireView()).navigate(R.id.action_search_to_manga_detail, bundle);

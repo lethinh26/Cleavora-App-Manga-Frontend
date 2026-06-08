@@ -85,7 +85,7 @@ public class ReaderAdapter extends RecyclerView.Adapter<ReaderAdapter.ReaderView
         return imageList != null ? imageList.size() : 0;
     }
 
-    static class ReaderViewHolder extends RecyclerView.ViewHolder {
+    public static class ReaderViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPage;
         ProgressBar progressBar;
 

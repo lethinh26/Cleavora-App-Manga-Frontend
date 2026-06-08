@@ -122,17 +122,26 @@ public class MyMangasFragment extends Fragment implements MangaCardAdapter.OnMan
     }
 
     @Override
-    public void onMangaClick(MangaResponse manga) {
-        // Show popup menu with owner actions
-        PopupMenu popup = new PopupMenu(requireContext(), rvMyMangas);
-        popup.getMenu().add(0, 1, 0, "Xem chi tiết");
+    public void onMangaClick(MangaResponse manga, View itemView) {
+        // Show popup menu anchored to the clicked item
+        PopupMenu popup = new PopupMenu(requireContext(), itemView);
+
+        // Chỉ hiện "Xem chi tiết" khi truyện đã được duyệt hoặc bị từ chối (có dữ liệu)
+        if (manga.getApprovalStatus() != MangaResponse.ApprovalStatus.PENDING) {
+            popup.getMenu().add(0, 1, 0, "Xem chi tiết");
+        }
 
         // Only show "Quản lý chương" for APPROVED mangas
         if (manga.getApprovalStatus() == MangaResponse.ApprovalStatus.APPROVED) {
             popup.getMenu().add(0, 2, 1, "Quản lý chương");
         }
 
-        popup.getMenu().add(0, 3, 2, "Xoá truyện");
+        // Hiện "Chỉnh sửa truyện" cho các trạng thái không bị BANNED
+        if (manga.getApprovalStatus() != MangaResponse.ApprovalStatus.BANNED) {
+            popup.getMenu().add(0, 4, 2, "Chỉnh sửa truyện");
+        }
+
+        popup.getMenu().add(0, 3, 3, "Xoá truyện");
 
         popup.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -145,6 +154,17 @@ public class MyMangasFragment extends Fragment implements MangaCardAdapter.OnMan
                     Bundle args = new Bundle();
                     args.putInt("mangaId", manga.getId());
                     Navigation.findNavController(requireView()).navigate(R.id.action_my_mangas_to_chapter_form, args);
+                    return true;
+                case 4: // Edit manga
+                    Bundle editArgs = new Bundle();
+                    editArgs.putInt("mangaId", manga.getId());
+                    editArgs.putString("title", manga.getTitle());
+                    editArgs.putString("author", manga.getAuthorName());
+                    editArgs.putString("description", manga.getDescription());
+                    editArgs.putString("coverUrl", manga.getCoverImageUrl());
+                    editArgs.putString("status", manga.getStatus() != null
+                            ? manga.getStatus().name() : "ONGOING");
+                    Navigation.findNavController(requireView()).navigate(R.id.action_my_mangas_to_edit_manga, editArgs);
                     return true;
                 case 3: // Delete manga
                     confirmDeleteManga(manga.getId());

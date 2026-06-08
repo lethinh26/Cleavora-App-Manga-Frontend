@@ -174,7 +174,6 @@ public class HomeFragment extends Fragment implements MangaCardAdapter.OnMangaCl
         }
     }
 
-    // ── RecyclerViews ────────────────────────────────────────────────────────
 
     private void setupRecyclerViews() {
         latestAdapter = new MangaCardAdapter(new ArrayList<>(), this);
@@ -190,7 +189,6 @@ public class HomeFragment extends Fragment implements MangaCardAdapter.OnMangaCl
         rvCompleted.setAdapter(completedAdapter);
     }
 
-    // ── Genre Spinner ────────────────────────────────────────────────────────
 
     private void setupGenreSpinner() {
         mangaRepository.getGenres(new MangaRepository.MangaCallback<List<GenreResponse>>() {
@@ -229,23 +227,19 @@ public class HomeFragment extends Fragment implements MangaCardAdapter.OnMangaCl
         });
     }
 
-    // ── Data loading ─────────────────────────────────────────────────────────
 
     private void loadDefaultData() {
-        mangaRepository.getMangas(new MangaRepository.MangaCallback<List<MangaResponse>>() {
+        // Load "Mới cập nhật" (newest first) + banner
+        mangaRepository.getMangas(0, 20, "newest", null, new MangaRepository.MangaCallback<List<MangaResponse>>() {
             @Override
             public void onSuccess(List<MangaResponse> data) {
                 if (!isAdded() || data == null) return;
                 requireActivity().runOnUiThread(() -> {
-                    // Banner: use the first 5 most recent mangas
                     setBannerData(data);
-
                     tvLatestHeader.setText("Mới cập nhật");
-                    setOtherSectionsVisible(true);
-
                     latestAdapter.updateData(data);
-                    popularAdapter.updateData(data);
 
+                    // Load "Đã hoàn thành" from the newest data
                     List<MangaResponse> completed = new ArrayList<>();
                     for (MangaResponse m : data) {
                         if (m.getStatus() == MangaResponse.MangaStatus.COMPLETED) {
@@ -253,6 +247,20 @@ public class HomeFragment extends Fragment implements MangaCardAdapter.OnMangaCl
                         }
                     }
                     completedAdapter.updateData(completed);
+                });
+            }
+            @Override
+            public void onError(String message) { showError(message); }
+        });
+
+        // Load "Phổ biến" (sorted by view count)
+        mangaRepository.getMangas(0, 20, "views", null, new MangaRepository.MangaCallback<List<MangaResponse>>() {
+            @Override
+            public void onSuccess(List<MangaResponse> data) {
+                if (!isAdded() || data == null) return;
+                requireActivity().runOnUiThread(() -> {
+                    popularAdapter.updateData(data);
+                    setOtherSectionsVisible(true);
                 });
             }
             @Override
@@ -292,7 +300,7 @@ public class HomeFragment extends Fragment implements MangaCardAdapter.OnMangaCl
     }
 
     @Override
-    public void onMangaClick(MangaResponse manga) {
+    public void onMangaClick(MangaResponse manga, View itemView) {
         Bundle bundle = new Bundle();
         bundle.putString("mangaSlug", manga.getSlug());
         if (manga.getId() != null) bundle.putInt("mangaId", manga.getId());

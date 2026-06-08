@@ -122,7 +122,7 @@ public class GenreFragment extends Fragment implements MangaCardAdapter.OnMangaC
     }
 
     @Override
-    public void onMangaClick(MangaResponse manga) {
+    public void onMangaClick(MangaResponse manga, View itemView) {
         Bundle bundle = new Bundle();
         bundle.putString("mangaSlug", manga.getSlug());
         Navigation.findNavController(requireView()).navigate(R.id.action_genre_to_manga_detail, bundle);
